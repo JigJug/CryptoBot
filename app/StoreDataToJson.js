@@ -1,10 +1,8 @@
 "use strict";
-//binance changed their policy on who has acces to api data so need to find something better
-var __importDefault = (this && this.__importDefault) || function (mod) {
-    return (mod && mod.__esModule) ? mod : { "default": mod };
-};
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.StoreDataJson = void 0;
+//binance changed their policy on who has acces to api data so need to find something better
+var fs = require("fs");
 /*
 This is a class which retrieves data from binance api (market data such as price and candle data) and can store the data to JSON file
 
@@ -22,31 +20,13 @@ Methods:
   getCandles: returns candles according to the params
   stores the candle data to local JSON file
 */
-var binance_api_node_1 = __importDefault(require("binance-api-node"));
-var fs = require('fs');
-var client = binance_api_node_1.default();
 var StoreDataJson = /** @class */ (function () {
-    function StoreDataJson(ticker, interval, limit) {
+    function StoreDataJson(ticker, interval, data) {
         this.ticker = ticker;
         this.interval = interval;
-        this.limit = limit;
+        this.data = data;
     }
-    StoreDataJson.prototype.getCandles = function () {
-        var params = {
-            symbol: this.ticker,
-            interval: this.interval,
-            limit: this.limit
-        };
-        function candleData(params) {
-            return new Promise(function (resolve, reject) {
-                client.candles(params).then(function (data) {
-                    resolve(data);
-                }).catch(function (error) { reject(new Error(error)); });
-            });
-        }
-        return candleData(params);
-    };
-    StoreDataJson.prototype.storeToJson = function (data) {
+    StoreDataJson.prototype.storeToJson = function () {
         var inte = this.interval;
         var tick = this.ticker;
         var fileName = "" + tick + inte + ".json";
@@ -58,7 +38,7 @@ var StoreDataJson = /** @class */ (function () {
                 console.log('Data written to file');
             });
         }
-        return storeToJSON(data);
+        return storeToJSON(this.data);
     };
     return StoreDataJson;
 }());

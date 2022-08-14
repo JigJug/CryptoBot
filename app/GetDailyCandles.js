@@ -1,23 +1,20 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-var AddEma30_1 = require("./AddEma30");
-var StoreDataToJson_1 = require("./StoreDataToJson");
 var fs = require('fs');
 var hourPlusMinute;
 var dayMilis = 1000 * 60; // * 60 * 24;
-function addDailyCandle() {
-    fs.readFile('SRMUSDT1d.json', 'utf-8', function (err, data) {
-        if (err)
-            throw err;
-        var grabData = new StoreDataToJson_1.StoreDataJson("SRMUSDT", "1d", 1);
-        grabData.getCandles().then(function (oneCaDat) {
-            var arrayOfObjects = AddEma30_1.addEma30(data, oneCaDat);
+/*function addDailyCandle(){
+    fs.readFile('SRMUSDT1d.json', 'utf-8', (err: Error, data:void) => {
+        if (err) throw err
+        const grabData = new StoreDataJson("SRMUSDT", "1d", 1);
+        grabData.getCandles().then(oneCaDat => {
+            let arrayOfObjects = addEma30(data, oneCaDat)
             grabData.storeToJson(arrayOfObjects);
-        }).catch(function (error) {
+        }).catch(error => {
             console.log(error);
-        });
-    });
-}
+        })
+    })
+}*/
 function addZero(i) {
     if (i < 10) {
         i = "0" + i;
@@ -50,10 +47,10 @@ function timePromise() {
 }
 function startDataGrab() {
     console.log('starting datagrab');
-    addDailyCandle();
+    //addDailyCandle();
     setInterval(function () {
         console.log('grabbing data');
-        addDailyCandle();
+        //addDailyCandle();
     }, dayMilis);
 }
 //this is our main entry to run the script.

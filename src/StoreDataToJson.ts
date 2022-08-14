@@ -1,5 +1,5 @@
 //binance changed their policy on who has acces to api data so need to find something better
-
+import fs = require('fs')
 
 /*
 This is a class which retrieves data from binance api (market data such as price and candle data) and can store the data to JSON file
@@ -19,50 +19,31 @@ Methods:
   stores the candle data to local JSON file
 */
 
-import Binance, { NewOrder, OrderSide, OrderType } from 'binance-api-node'
-const fs = require('fs')
-const client = Binance()
-
 
 export class StoreDataJson {
   ticker: string
-  interval?: string
-  limit?: number
+  interval: string
+  data 
 
   constructor(
       ticker: string,
-      interval?: string,
-      limit?: number
+      interval: string,
+      data: any
   ){
       this.ticker = ticker
       this.interval = interval
-      this.limit = limit
+      this.data = data
   }
 
-  getCandles(){
-    let params = {
-      symbol: this.ticker,
-      interval: this.interval,
-      limit: this.limit
-    }
 
-    function candleData(params){
-      return new Promise<object>((resolve, reject) => {
-        client.candles(params).then(data => {
-          resolve(data)
-        }).catch((error) => {reject(new Error(error))})
-      })
-    }
-    return candleData(params)
-  }
 
-  storeToJson(data){
+  storeToJson(){
 
     let inte = this.interval
     let tick = this.ticker
     let fileName = `${tick}${inte}.json`
 
-    function storeToJSON(data){
+    function storeToJSON(data: any){
 
       data = JSON.stringify(data, null, 2);
 
@@ -72,6 +53,6 @@ export class StoreDataJson {
       });
     }
 
-    return storeToJSON(data)
+    return storeToJSON(this.data)
   }
 }

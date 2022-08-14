@@ -1,5 +1,4 @@
-import { Console } from 'node:console';
-import { addEma30 } from './AddEma30';
+
 import { StoreDataJson } from './StoreDataToJson'
 const fs = require('fs');
 let hourPlusMinute;
@@ -7,8 +6,8 @@ let dayMilis = 1000 * 60// * 60 * 24;
 
 
 
-function addDailyCandle(){
-    fs.readFile('SRMUSDT1d.json', 'utf-8', (err, data) => {
+/*function addDailyCandle(){
+    fs.readFile('SRMUSDT1d.json', 'utf-8', (err: Error, data:void) => {
         if (err) throw err
         const grabData = new StoreDataJson("SRMUSDT", "1d", 1);
         grabData.getCandles().then(oneCaDat => {
@@ -18,10 +17,10 @@ function addDailyCandle(){
             console.log(error);
         })
     })
-}
+}*/
 
 
-function addZero(i) {
+function addZero(i: any) { 
     if (i < 10) {
       i = "0" + i;
     }
@@ -61,12 +60,12 @@ function timePromise(){
 function startDataGrab(){
 
     console.log('starting datagrab');
-    addDailyCandle();
+    //addDailyCandle();
 
     setInterval(
         function() {
             console.log('grabbing data')
-            addDailyCandle();
+            //addDailyCandle();
         }, dayMilis
     );
 
