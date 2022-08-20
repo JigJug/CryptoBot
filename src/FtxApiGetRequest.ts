@@ -1,6 +1,4 @@
-
 import { HttpsGetRequest } from "./NewGetRequest";
-import { StoreDataJson } from "./StoreDataToJson";
 
 //ftx get response type
 type FtxApiObject = {

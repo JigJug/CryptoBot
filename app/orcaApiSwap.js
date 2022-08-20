@@ -44,7 +44,7 @@ var fs = require('fs');
 var web3_js_1 = require("@solana/web3.js");
 var sdk_1 = require("@orca-so/sdk");
 var decimal_js_1 = __importDefault(require("decimal.js"));
-function orcaApiSwap() {
+function orcaApiSwap(path) {
     var _this = this;
     return new Promise(function (resolve, reject) {
         var main = function () { return __awaiter(_this, void 0, void 0, function () {
@@ -52,7 +52,7 @@ function orcaApiSwap() {
             return __generator(this, function (_a) {
                 switch (_a.label) {
                     case 0:
-                        secretKeyString = fs.readFileSync("D:\\CryptoProject\\et\\et.json", "utf8", function (err, data) {
+                        secretKeyString = fs.readFileSync(path, "utf8", function (err, data) {
                             if (err) {
                                 console.log(err);
                                 return;

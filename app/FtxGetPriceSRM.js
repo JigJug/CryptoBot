@@ -1,6 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-var FtxApiGetHandlerMarketData_1 = require("./FtxApiGetHandlerMarketData");
+var FtxApiGetRequest_1 = require("./FtxApiGetRequest");
 var dateTime = new Date();
 //let h = addZero(dateTime.getUTCHours());
 //let m = addZero(dateTime.getUTCMinutes());
@@ -12,7 +12,7 @@ var pairing1 = pairing.replace('/', '');
 var ftxEndpoint = "https://ftx.com/api";
 var endPoint = ftxEndpoint + "/markets/" + pairing;
 ///trades
-var marketData = new FtxApiGetHandlerMarketData_1.FtxGetHandler(pairing, endPoint);
+var marketData = new FtxApiGetRequest_1.FtxGetHandler(pairing, endPoint);
 marketData.lastEntry = false;
 function doThing() {
     marketData.ftxGetMarket()

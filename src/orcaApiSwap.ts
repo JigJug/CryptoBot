@@ -3,14 +3,15 @@ import { Connection, Keypair } from "@solana/web3.js";
 import { getOrca, OrcaPoolConfig } from "@orca-so/sdk";
 import Decimal from "decimal.js";
 
-export function orcaApiSwap(){
+export function orcaApiSwap(path:string){
     return new Promise<void>((resolve, reject) => {
 
         const main = async () => {
 
             /*** Setup ***/
             // 1. Read secret key file to get owner keypair2
-            let secretKeyString = fs.readFileSync("D:\\CryptoProject\\et\\et.json", "utf8", (err: Error, data: any)=>{
+            //path = secret key filepath
+            let secretKeyString = fs.readFileSync(path, "utf8", (err: Error, data: any)=>{
                 if(err){
                     console.log(err)
                     return
