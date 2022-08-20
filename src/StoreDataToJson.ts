@@ -5,25 +5,28 @@ data to json
 */
 
 export class StoreDataJson {
+  path: string
   name1: string
   name2: string
   data 
 
   constructor(
-      name1: string,
-      name2: string,
-      data: any
+    path: string,
+    name1: string,
+    name2: string,
+    data: any
   ){
-      this.name1 = name1
-      this.name2 = name2
-      this.data = data
+    this.path = path
+    this.name1 = name1
+    this.name2 = name2
+    this.data = data
   }
 
   storeToJson(){
 
     return new Promise<void>((resolve, reject)=>{
 
-      let fileName = `..\\MarketData\\${this.name1}${this.name2}.json`
+      let fileName = `${this.path}${this.name1}${this.name2}.json`
 
       this.data = JSON.stringify(this.data, null, 2);
 
