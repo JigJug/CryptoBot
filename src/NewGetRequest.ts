@@ -1,6 +1,6 @@
 const https = require('https');
 
-export class NewGetRequest {
+export class HttpsGetRequest {
 
     endPoint: String
 
@@ -17,9 +17,9 @@ export class NewGetRequest {
 
         return new Promise<any> ((resolve, reject) => {
 
-            let timer = setTimeout(()=>{resolve(opStr);}, 10000);
+            let timer: NodeJS.Timeout = setTimeout(()=>{resolve(opStr);}, 10000);
 
-            let opStr = '';
+            let opStr: string = '';
             
             https.get(this.endPoint, (res: any) => {
 
@@ -31,7 +31,6 @@ export class NewGetRequest {
             
             }).on('error', (e: Error) => {
                 clearTimeout(timer)
-                console.log('NewGetReq ERROR: '+ e)
                 reject(e);
             });
         });

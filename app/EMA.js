@@ -1,4 +1,9 @@
 "use strict";
+/*
+Calculates the ema for a given closing price at the end of the time interval
+To find the first ema entry When calculating a data set, the SMA will need to be run first
+The SMA value will give the first value of EMA yesterday.
+*/
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.EMA = void 0;
 var EMA = /** @class */ (function () {

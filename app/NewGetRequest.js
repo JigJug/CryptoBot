@@ -1,13 +1,13 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.NewGetRequest = void 0;
+exports.HttpsGetRequest = void 0;
 var https = require('https');
-var NewGetRequest = /** @class */ (function () {
-    function NewGetRequest(endPoint) {
+var HttpsGetRequest = /** @class */ (function () {
+    function HttpsGetRequest(endPoint) {
         this.endPoint = endPoint;
     }
     //methods
-    NewGetRequest.prototype.httpsGet = function () {
+    HttpsGetRequest.prototype.httpsGet = function () {
         //executes get request 
         //converts buffer to string and resolves with full string
         //if there is no data after 2 seconds the promise resolves with the data
@@ -23,11 +23,10 @@ var NewGetRequest = /** @class */ (function () {
                 });
             }).on('error', function (e) {
                 clearTimeout(timer);
-                console.log('NewGetReq ERROR: ' + e);
                 reject(e);
             });
         });
     };
-    return NewGetRequest;
+    return HttpsGetRequest;
 }());
-exports.NewGetRequest = NewGetRequest;
+exports.HttpsGetRequest = HttpsGetRequest;

@@ -1,58 +1,40 @@
-//binance changed their policy on who has acces to api data so need to find something better
 import fs = require('fs')
 
 /*
-This is a class which retrieves data from binance api (market data such as price and candle data) and can store the data to JSON file
-
-This can be used in a umber of ways for example:
-  - a script to collect daily candles over a period of up to 500 days weeks or months, thi data can be then used or updated to a database.
-  - a script to collect minute to daily chart updates or prices for a trading bot.
-
-StoreDataJason accepts 3 params: ticker, interval and limit
-  - ticker is the pairing eg. BTCUSDT
-  - interval time interval eg 1m 4h 1d
-  - limit is the number of data points returned when making candle data requests max: 500
-
-Methods:
-  Price: gets current market price of ticker. Max requests 100 per second?
-  getCandles: returns candles according to the params
-  stores the candle data to local JSON file
+data to json
 */
 
-
 export class StoreDataJson {
-  ticker: string
-  interval: string
+  name1: string
+  name2: string
   data 
 
   constructor(
-      ticker: string,
-      interval: string,
+      name1: string,
+      name2: string,
       data: any
   ){
-      this.ticker = ticker
-      this.interval = interval
+      this.name1 = name1
+      this.name2 = name2
       this.data = data
   }
 
-
-
   storeToJson(){
 
-    let inte = this.interval
-    let tick = this.ticker
-    let fileName = `${tick}${inte}.json`
+    return new Promise<void>((resolve, reject)=>{
 
-    function storeToJSON(data: any){
+      let fileName = `..\\MarketData\\${this.name1}${this.name2}.json`
 
-      data = JSON.stringify(data, null, 2);
+      this.data = JSON.stringify(this.data, null, 2);
 
-      fs.writeFile(fileName, data, (err) => {
-          if (err) throw err;
-          console.log('Data written to file');
+      fs.writeFile(fileName, this.data, (err) => {
+        if (err) {
+          reject(err)
+        }
+        console.log('Data written to file');
+        resolve()
       });
-    }
 
-    return storeToJSON(this.data)
+    });
   }
 }
