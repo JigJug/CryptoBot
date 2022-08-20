@@ -10,8 +10,7 @@ var EMA = /** @class */ (function () {
     function EMA(period, data) {
         this.period = period;
         this.data = data;
-        this.sma = this.smaCalc(this.data);
-        this.fromStart = false;
+        this.sma = this.smaCalc();
     }
     //methods
     EMA.prototype.emaCalc = function (priceToday, emaYesterday) {
@@ -25,13 +24,11 @@ var EMA = /** @class */ (function () {
     //only use this if you need to calc full ema. runs once to get the sma
     //need sma to use as the first value of ema yesterday, then from there
     //can calc the ema
-    EMA.prototype.smaCalc = function (inputArray) {
+    EMA.prototype.smaCalc = function () {
         var totalPrice = 0;
-        var currentPrice = 0;
-        var sma;
-        for (var i = 0; i < this.period; i++) {
-            totalPrice = totalPrice + inputArray[i].close;
-        }
+        this.data.map(function (value) {
+            totalPrice += value.close;
+        });
         return totalPrice / this.period;
     };
     return EMA;

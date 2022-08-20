@@ -8,17 +8,15 @@ export class EMA{
 
     period: number
     sma: any
-    fromStart: boolean
-    data?: []
+    data: []
 
     constructor(
         period: number,
-        data?: []
+        data: []
     ){
         this.period = period
         this.data = data
-        this.sma = this.smaCalc(this.data)
-        this.fromStart = false
+        this.sma = this.smaCalc()
     }
 
     //methods
@@ -35,13 +33,12 @@ export class EMA{
     //only use this if you need to calc full ema. runs once to get the sma
     //need sma to use as the first value of ema yesterday, then from there
     //can calc the ema
-    smaCalc(inputArray: any){
+    smaCalc(){
         let totalPrice = 0;
-        let currentPrice = 0;
-        let sma
-        for(let i = 0; i < this.period; i++){
-            totalPrice = totalPrice + inputArray[i].close; 
-        }
+
+        this.data.map((value: any) => {
+            totalPrice += value.close
+        })
         
         return totalPrice / this.period
     }

@@ -56,7 +56,7 @@ function calcEmaStoreData(ret, emaPeriod, pairing1) {
         var emaYesterday;
         var priceToday;
         var getEMA = new EMA_1.EMA(emaPeriod, ret.result);
-        emaYesterday = getEMA.smaCalc(ret.result);
+        emaYesterday = getEMA.smaCalc();
         ret.result[emaPeriod].ema = emaYesterday;
         var calcEma = function (currentValue, index) {
             if (index > emaPeriod) {
