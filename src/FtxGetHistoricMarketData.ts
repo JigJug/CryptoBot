@@ -50,6 +50,7 @@ function calcEmaStoreData(ret:any, emaPeriod: number, pairing1: string) {
         const getEMA = new EMA(emaPeriod, ret.result);
 
         emaYesterday = getEMA.smaCalc();
+        console.log(emaYesterday)
 
         ret.result[emaPeriod].ema = emaYesterday;
     

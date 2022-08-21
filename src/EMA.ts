@@ -8,11 +8,11 @@ export class EMA{
 
     period: number
     sma: any
-    data: []
+    data: any
 
     constructor(
         period: number,
-        data: []
+        data: any
     ){
         this.period = period
         this.data = data
@@ -36,9 +36,13 @@ export class EMA{
     smaCalc(){
         let totalPrice = 0;
 
-        this.data.map((value: any) => {
-            totalPrice += value.close
-        })
+        //this.data.map((value: any) => {
+        //    totalPrice += value.close
+        //})
+
+        for(let i = 0; i < this.period; i++){
+            totalPrice = totalPrice + this.data[i].close; 
+        }
         
         return totalPrice / this.period
     }

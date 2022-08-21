@@ -3,25 +3,37 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.CryptoTradingBot = void 0;
 var EMA_1 = require("./EMA");
 var FtxApiGetRequest_1 = require("./FtxApiGetRequest");
-var orcaApiSwap_1 = require("./orcaApiSwap");
+var orcaApiSwapRayUsdcSell_1 = require("./orcaApiSwapRayUsdcSell");
+var orcaApiSwapUsdcRayBuy_1 = require("./orcaApiSwapUsdcRayBuy");
 var StoreDataToJson_1 = require("./StoreDataToJson");
 var fs = require('fs');
 var CryptoTradingBot = /** @class */ (function () {
-    function CryptoTradingBot(pairing, marketData, priceEndPoint, price, marketDataEndpoint, jsonPath, secretkeyPath) {
+    function CryptoTradingBot(pairing, marketData, priceEndPoint, price, marketDataEndpoint, jsonPath, secretkeyPath, ammountUsdc) {
         this.pairing = pairing;
         this.marketData = marketData;
         this.priceEndPoint = priceEndPoint;
         this.price = price;
-        this.emaYesterday = this.marketData[this.marketData.length - 1].ema;
         this.marketDataEndpoint = marketDataEndpoint;
         this.jsonPath = jsonPath;
+        this.secretkeyPath = secretkeyPath;
+        this.emaYesterday = this.marketData[this.marketData.length - 1].ema;
         this.buySellTrigger = true;
         this.secretkeyPath = secretkeyPath;
         this.bought = false;
         this.sold = true;
-        this.getp = this.getPrice();
-        this.getfh = this.getFourHourData();
+        this.ammountUsdc = ammountUsdc;
+        this.ammountCoin = 0;
     }
+    CryptoTradingBot.prototype.startBot = function () {
+        return this.setStartBot();
+    };
+    CryptoTradingBot.prototype.setStartBot = function () {
+        this.getPrice();
+        this.getFourHourData();
+        this.getBuy();
+        this.getSell();
+    };
+    //current price
     CryptoTradingBot.prototype.getPrice = function () {
         return this.setPrice();
     };
@@ -32,6 +44,7 @@ var CryptoTradingBot = /** @class */ (function () {
             price.ftxGetMarket()
                 .then(function (ret) {
                 _this.price = ret.result.price;
+                //console.log(this.price)
             })
                 .catch(function (err) {
                 console.log(err);
@@ -41,24 +54,23 @@ var CryptoTradingBot = /** @class */ (function () {
     CryptoTradingBot.prototype.testPrice = function () {
         return this.price;
     };
+    //4hour data
     CryptoTradingBot.prototype.getFourHourData = function () {
         return this.setFourHourData();
     };
     CryptoTradingBot.prototype.setFourHourData = function () {
         var _this = this;
-        if (this.emaYesterday = undefined) {
-            this.emaYesterday = this.marketData[this.marketData.length - 1].ema;
-        }
         var newMdSet = new FtxApiGetRequest_1.FtxGetHandler(this.pairing, this.marketDataEndpoint);
         newMdSet.lastEntry = true;
         var newEma = new EMA_1.EMA(70, this.marketData);
-        var time = new Date();
         //let timeMills = time.getTime();
         var fourHour = 1000 * 60 * 60 * 4;
         setInterval(function () {
+            var time = new Date();
             var timeMills = time.getTime();
             var lastIndex = _this.marketData.length - 1;
-            if (timeMills - _this.marketData[lastIndex].time > fourHour) {
+            var timeDiff = timeMills - _this.marketData[lastIndex].time;
+            if (timeDiff > fourHour) {
                 newMdSet.ftxGetMarket()
                     .then(function (md) {
                     md.ema = newEma.emaCalc(md.close, _this.emaYesterday);
@@ -71,24 +83,59 @@ var CryptoTradingBot = /** @class */ (function () {
                     console.log(err);
                 });
             }
-        }, 60000);
+            console.log('time: ' + time + '\n'
+                + 'price: ' + _this.testPrice() + '\n'
+                + 'ema: ' + _this.emaYesterday + '\n'
+                + 'timenow: ' + timeMills + '\n'
+                + 'timediff: ' + timeDiff + '\n'
+                + 'bought: ' + _this.bought + '\n'
+                + 'sold: ' + _this.sold + '\n');
+        }, 320000);
     };
-    CryptoTradingBot.prototype.readFile = function () {
-        fs.readFileSync('', "utf8", function (err, data) {
-            if (err) {
-                console.log(err);
-            }
-        });
+    //buying and selling
+    CryptoTradingBot.prototype.getBuy = function () {
+        return this.buy;
     };
     CryptoTradingBot.prototype.buy = function () {
-        var orcaApi = orcaApiSwap_1.orcaApiSwap(this.secretkeyPath, 'SRM', 'USDC');
-        while (true) {
-            if (this.price > this.emaYesterday) {
-                if (this.buySellTrigger && this.sold) {
-                    this.buySellTrigger = false;
+        var _this = this;
+        setInterval(function () {
+            if (_this.price > _this.emaYesterday) {
+                if (_this.buySellTrigger && _this.sold) {
+                    _this.buySellTrigger = false;
+                    orcaApiSwapUsdcRayBuy_1.orcaApiSwapBuy(_this.secretkeyPath, _this.ammountUsdc)
+                        .then(function (ammount) {
+                        _this.ammountCoin = ammount;
+                        _this.buySellTrigger = true;
+                        _this.bought = true;
+                    })
+                        .catch(function (err) {
+                        console.log(err);
+                    });
                 }
             }
-        }
+        }, 3000);
+    };
+    CryptoTradingBot.prototype.getSell = function () {
+        return this.sell();
+    };
+    CryptoTradingBot.prototype.sell = function () {
+        var _this = this;
+        setInterval(function () {
+            if (_this.price < _this.emaYesterday) {
+                if (_this.buySellTrigger && _this.bought) {
+                    _this.buySellTrigger = false;
+                    orcaApiSwapRayUsdcSell_1.orcaApiSwapSell(_this.secretkeyPath, _this.ammountUsdc)
+                        .then(function (ammount) {
+                        _this.ammountUsdc = ammount;
+                        _this.buySellTrigger = true;
+                        _this.sold = true;
+                    })
+                        .catch(function (err) {
+                        console.log(err);
+                    });
+                }
+            }
+        }, 3000);
     };
     return CryptoTradingBot;
 }());

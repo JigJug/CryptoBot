@@ -1,6 +1,7 @@
 import { EMA } from './EMA'
 import {FtxGetHandler} from './FtxApiGetRequest'
-import { orcaApiSwap } from './orcaApiSwap'
+import { orcaApiSwapSell } from './orcaApiSwapRayUsdcSell'
+import { orcaApiSwapBuy } from './orcaApiSwapUsdcRayBuy'
 import { StoreDataJson } from './StoreDataToJson'
 const fs = require('fs')
 
@@ -17,9 +18,8 @@ export class CryptoTradingBot {
     secretkeyPath
     bought
     sold
-
-    getp
-    getfh
+    ammountUsdc
+    ammountCoin
     
     constructor(
         pairing: string,
@@ -28,25 +28,38 @@ export class CryptoTradingBot {
         price: number,
         marketDataEndpoint: string,
         jsonPath: string,
-        secretkeyPath: string
+        secretkeyPath: string,
+        ammountUsdc: number
     ){
         this.pairing = pairing
         this.marketData = marketData
         this.priceEndPoint = priceEndPoint
         this.price = price
-        this.emaYesterday = this.marketData[this.marketData.length - 1].ema
         this.marketDataEndpoint = marketDataEndpoint
         this.jsonPath = jsonPath
+        this.secretkeyPath = secretkeyPath
+        this.emaYesterday = this.marketData[this.marketData.length - 1].ema
+
         this.buySellTrigger = true
         this.secretkeyPath = secretkeyPath
         this.bought = false
         this.sold = true
-
-        this.getp = this.getPrice();
-        this.getfh = this.getFourHourData();
-
+        this.ammountUsdc = ammountUsdc
+        this.ammountCoin = 0
     }
 
+    startBot(){
+        return this.setStartBot();
+    }
+
+    setStartBot(){
+        this.getPrice();
+        this.getFourHourData();
+        this.getBuy();
+        this.getSell();
+    }
+
+    //current price
     getPrice(){
         return this.setPrice();
     }
@@ -57,6 +70,7 @@ export class CryptoTradingBot {
             price.ftxGetMarket()
             .then((ret) => {
                 this.price = ret.result.price
+                //console.log(this.price)
             })
             .catch((err) =>{
                 console.log(err);
@@ -67,26 +81,25 @@ export class CryptoTradingBot {
         return this.price;
     }
 
-
+    //4hour data
     getFourHourData(){
         return this.setFourHourData();
     }
     setFourHourData(){
-        if(this.emaYesterday = undefined){
-            this.emaYesterday = this.marketData[this.marketData.length - 1].ema
-        }
         const newMdSet = new FtxGetHandler(this.pairing, this.marketDataEndpoint);
         newMdSet.lastEntry = true
         const newEma = new EMA(70, this.marketData);
 
-        let time = new Date();
+        
         //let timeMills = time.getTime();
         let fourHour = 1000 * 60 * 60 * 4;
 
         setInterval(() => {
+            let time = new Date();
             let timeMills = time.getTime();
             let lastIndex = this.marketData.length - 1
-            if(timeMills - this.marketData[lastIndex].time > fourHour){
+            let timeDiff = timeMills - this.marketData[lastIndex].time
+            if(timeDiff > fourHour){
 
                 newMdSet.ftxGetMarket()
                 .then((md) => {
@@ -95,7 +108,7 @@ export class CryptoTradingBot {
                     this.emaYesterday = md.ema;
                     this.marketData.push(md);
 
-                    let storeJson = new StoreDataJson(
+                    const storeJson = new StoreDataJson(
                         this.jsonPath,
                         this.pairing.replace('/', ''),
                         '14400',
@@ -108,29 +121,64 @@ export class CryptoTradingBot {
                 });
 
             }
-        },60000)
+            console.log(
+                'time: ' + time + '\n'
+                + 'price: ' + this.testPrice() + '\n'
+                + 'ema: ' + this.emaYesterday + '\n'
+                + 'timenow: ' + timeMills + '\n'
+                + 'timediff: ' + timeDiff + '\n'
+                + 'bought: ' + this.bought + '\n'
+                + 'sold: ' + this.sold + '\n'
+            );
+        },320000)
     }
 
-    readFile(){
-        fs.readFileSync('', "utf8", (err: Error, data: any)=>{
-            if(err){
-                console.log(err)
-            }
-        });
+    //buying and selling
+    getBuy(){
+        return this.buy
     }
 
     buy(){
-        
-        let orcaApi = orcaApiSwap(this.secretkeyPath, 'SRM', 'USDC')
-        while(true){
+        setInterval(()=>{
             if(this.price > this.emaYesterday){
                 if(this.buySellTrigger && this.sold){
                     this.buySellTrigger = false
-                    
-
+                    orcaApiSwapBuy(this.secretkeyPath, this.ammountUsdc)
+                    .then((ammount: number)=>{
+                        this.ammountCoin = ammount
+                        this.buySellTrigger = true
+                        this.bought = true
+                        
+                    })
+                    .catch((err) => {
+                        console.log(err);
+                    });
                 }
             }
-        }
+        },3000)
+    }
+
+    getSell(){
+        return this.sell();
+    }
+
+    sell(){
+        setInterval(()=>{
+            if(this.price < this.emaYesterday){
+                if(this.buySellTrigger && this.bought){
+                    this.buySellTrigger = false
+                    orcaApiSwapSell(this.secretkeyPath, this.ammountUsdc)
+                    .then((ammount: number)=>{
+                        this.ammountUsdc = ammount
+                        this.buySellTrigger = true
+                        this.sold = true
+                    })
+                    .catch((err) => {
+                        console.log(err);
+                    });
+                }
+            }
+        },3000)
     }
 
 

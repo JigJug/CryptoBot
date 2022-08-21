@@ -1,4 +1,8 @@
-import { orcaApiSwap } from "./orcaApiSwapSolUsdc";
+import { orcaApiSwapSell } from "./orcaApiSwapOrcaUsdcSell";
+import { orcaApiSwapBuy } from "./orcaApiSwapUsdcOrcaBuy"
 
-let path = ''
-orcaApiSwap(path);
+
+let path = 'D:\\CryptoProject\\et\\et.json'
+//orcaApiSwapBuy(path, 9);
+
+orcaApiSwapSell(path, 4);

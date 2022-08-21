@@ -42,7 +42,7 @@ export class FtxGetHandler {
                 }
             })
             .catch(err => {
-                console.log(`ERROR: ${err}`);
+                console.log(`ERROR FTXGETREQUEST: ${err}`);
                 reject(err);
             })
         })

@@ -26,9 +26,12 @@ var EMA = /** @class */ (function () {
     //can calc the ema
     EMA.prototype.smaCalc = function () {
         var totalPrice = 0;
-        this.data.map(function (value) {
-            totalPrice += value.close;
-        });
+        //this.data.map((value: any) => {
+        //    totalPrice += value.close
+        //})
+        for (var i = 0; i < this.period; i++) {
+            totalPrice = totalPrice + this.data[i].close;
+        }
         return totalPrice / this.period;
     };
     return EMA;

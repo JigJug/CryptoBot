@@ -29,7 +29,7 @@ var FtxGetHandler = /** @class */ (function () {
                 }
             })
                 .catch(function (err) {
-                console.log("ERROR: " + err);
+                console.log("ERROR FTXGETREQUEST: " + err);
                 reject(err);
             });
         });

@@ -3,8 +3,8 @@ import { Connection, Keypair } from "@solana/web3.js";
 import { getOrca, OrcaPoolConfig } from "@orca-so/sdk";
 import Decimal from "decimal.js";
 
-export function orcaApiSwap(path:string){
-    return new Promise<void>((resolve, reject) => {
+export function orcaApiSwapBuy(path:string, ammount: number){
+    return new Promise<number>((resolve, reject) => {
 
         const main = async () => {
 
@@ -28,27 +28,29 @@ export function orcaApiSwap(path:string){
             try {
                 /*** Swap ***/
                 // 3. We will be swapping 0.1 SOL for some ORCA
-                const orcaSolPool = orca.getPool(OrcaPoolConfig.ORCA_SOL); // get the liquidity pool
-                const orcaToken = orcaSolPool.getTokenA(); //or getTokenB(); // get the token a or b from pool name
-                const orcaAmount = new Decimal(4.662);
-                const quote = await orcaSolPool.getQuote(orcaToken, orcaAmount);
-                const solAmount = quote.getMinOutputAmount();
+                const rayUsdcPool = orca.getPool(OrcaPoolConfig.RAY_USDC); // get the liquidity pool
+                const usdcToken = rayUsdcPool.getTokenB(); //or getTokenA(); // get the token a or b from pool name
+                const usdcAmount = new Decimal(ammount);
+                const quote = await rayUsdcPool.getQuote(usdcToken, usdcAmount);
+                const rayAmount = quote.getMinOutputAmount();
           
-                console.log(`Swap ${orcaAmount.toString()} orca for at least ${solAmount.toNumber()} sol`);
-                const swapPayload = await orcaSolPool.swap(owner, orcaToken, orcaAmount, solAmount);
+                console.log(`Swap ${usdcAmount.toString()} usdc for at least ${rayAmount.toNumber()} ray`);
+                const swapPayload = await rayUsdcPool.swap(owner, usdcToken, usdcAmount, rayAmount);
                 const swapTxId = await swapPayload.execute();
                 console.log("Swapped:", swapTxId, "\n");
+                let returnNum = Math.trunc(rayAmount.toNumber())
+                resolve(returnNum);
           
           
             } catch (err) {
                 console.warn(err);
+                reject(err);
             }
         };
           
         main()
         .then(() => {
             console.log("Done");
-            resolve()
         })
         .catch((e) => {
             console.error(e);

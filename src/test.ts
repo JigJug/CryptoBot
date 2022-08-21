@@ -2,29 +2,42 @@ import { CryptoTradingBot } from "./CryptoTradingBot";
 const fs = require('fs')
 
 let windowResolution: string = '14400'//4h
-let pairing: string = 'SRM/USD'
+let pairing: string = 'RAY/USD'
 let pairing1: string = pairing.replace('/', '')
 let ftxEndpoint: string = `https://ftx.com/api`;
 let endPoint = `${ftxEndpoint}/markets/${pairing}`
 
-let path = 'D:\\CryptoProject\\DataCollector\\MarketData\\SRMUSD14400.json'
+let marketDataEndpoint = `${ftxEndpoint}/markets/${pairing}/candles?resolution=${windowResolution}`
 
-let lastData = fs.readFileSync(path, "utf8", (err: Error, data: any)=>{
+let path = 'D:\\CryptoProject\\DataCollector\\MarketData\\'
+
+let data = fs.readFileSync(path, "utf8", (err: Error, data: any)=>{
     if(err){
         console.log(err)
     }
-    
-    
 });
+let Data = JSON.parse(data)
 
-lastData = JSON.parse(lastData)
+let secretKeyPath = ''
 
-lastData = lastData[lastData.length - 1]
+const NewBot = new CryptoTradingBot(pairing, Data, endPoint, 0.70, marketDataEndpoint, path, secretKeyPath, 9)
 
-console.log(lastData.ema)
+//NewBot.getFourHourData();
+//NewBot.getPrice();
 
-const NewBot = new CryptoTradingBot(pairing,[],endPoint)
+console.log(NewBot.ammountCoin)
+console.log(NewBot.ammountUsdc)
+console.log(NewBot.bought)
+console.log(NewBot.buySellTrigger)
+console.log(NewBot.emaYesterday)
+console.log(NewBot.jsonPath)
+console.log(NewBot.marketDataEndpoint)
+console.log(NewBot.pairing)
+console.log(NewBot.price)
+console.log(NewBot.priceEndPoint)
+console.log(NewBot.secretkeyPath)
+console.log(NewBot.sold)
 
-setInterval(()=>{
-    console.log(NewBot.testPrice())
-}, 15000)
+NewBot.startBot();
+
+

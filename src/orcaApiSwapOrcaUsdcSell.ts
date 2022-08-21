@@ -3,7 +3,7 @@ import { Connection, Keypair } from "@solana/web3.js";
 import { getOrca, OrcaPoolConfig } from "@orca-so/sdk";
 import Decimal from "decimal.js";
 
-export function orcaApiSwap(path:string){
+export function orcaApiSwapSell(path:string, ammount: number){
     return new Promise<void>((resolve, reject) => {
 
         const main = async () => {
@@ -28,14 +28,14 @@ export function orcaApiSwap(path:string){
             try {
                 /*** Swap ***/
                 // 3. We will be swapping 0.1 SOL for some ORCA
-                const solUsdcPool = orca.getPool(OrcaPoolConfig.SOL_USDC); // get the liquidity pool
-                const solToken = solUsdcPool.getTokenA(); //or getTokenB(); // get the token a or b from pool name
-                const solAmount = new Decimal(0.27);
-                const quote = await solUsdcPool.getQuote(solToken, solAmount);
+                const orcaUsdcPool = orca.getPool(OrcaPoolConfig.ORCA_USDC); // get the liquidity pool
+                const orcaToken = orcaUsdcPool.getTokenA(); //or getTokenB(); // get the token a or b from pool name
+                const orcaAmount = new Decimal(ammount);
+                const quote = await orcaUsdcPool.getQuote(orcaToken, orcaAmount);
                 const usdcAmount = quote.getMinOutputAmount();
           
-                console.log(`Swap ${solAmount.toString()} sol for at least ${usdcAmount.toNumber()} usdc`);
-                const swapPayload = await solUsdcPool.swap(owner, solToken, solAmount, usdcAmount);
+                console.log(`Swap ${orcaAmount.toString()} orca for at least ${usdcAmount.toNumber()} usdc`);
+                const swapPayload = await orcaUsdcPool.swap(owner, orcaToken, orcaAmount, usdcAmount);
                 const swapTxId = await swapPayload.execute();
                 console.log("Swapped:", swapTxId, "\n");
           

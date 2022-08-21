@@ -39,16 +39,16 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.orcaApiSwap = void 0;
+exports.orcaApiSwapBuy = void 0;
 var fs = require('fs');
 var web3_js_1 = require("@solana/web3.js");
 var sdk_1 = require("@orca-so/sdk");
 var decimal_js_1 = __importDefault(require("decimal.js"));
-function orcaApiSwap(path, coin1, coin2) {
+function orcaApiSwapBuy(path, ammount) {
     var _this = this;
     return new Promise(function (resolve, reject) {
         var main = function () { return __awaiter(_this, void 0, void 0, function () {
-            var secretKeyString, secretKey, owner, connection, orca, orcaSolPool, solToken, solAmount, quote, orcaAmount, swapPayload, swapTxId, err_1;
+            var secretKeyString, secretKey, owner, connection, orca, orcaUsdcPool, usdcToken, usdcAmount, quote, orcaAmount, swapPayload, swapTxId, err_1;
             return __generator(this, function (_a) {
                 switch (_a.label) {
                     case 0:
@@ -66,15 +66,15 @@ function orcaApiSwap(path, coin1, coin2) {
                         _a.label = 1;
                     case 1:
                         _a.trys.push([1, 5, , 6]);
-                        orcaSolPool = orca.getPool(sdk_1.OrcaPoolConfig.ORCA_SOL);
-                        solToken = orcaSolPool.getTokenB();
-                        solAmount = new decimal_js_1.default(0.1);
-                        return [4 /*yield*/, orcaSolPool.getQuote(solToken, solAmount)];
+                        orcaUsdcPool = orca.getPool(sdk_1.OrcaPoolConfig.ORCA_USDC);
+                        usdcToken = orcaUsdcPool.getTokenB();
+                        usdcAmount = new decimal_js_1.default(ammount);
+                        return [4 /*yield*/, orcaUsdcPool.getQuote(usdcToken, usdcAmount)];
                     case 2:
                         quote = _a.sent();
                         orcaAmount = quote.getMinOutputAmount();
-                        console.log("Swap " + solAmount.toString() + " SOL for at least " + orcaAmount.toNumber() + " ORCA");
-                        return [4 /*yield*/, orcaSolPool.swap(owner, solToken, solAmount, orcaAmount)];
+                        console.log("Swap " + usdcAmount.toString() + " usdc for at least " + orcaAmount.toNumber() + " orca");
+                        return [4 /*yield*/, orcaUsdcPool.swap(owner, usdcToken, usdcAmount, orcaAmount)];
                     case 3:
                         swapPayload = _a.sent();
                         return [4 /*yield*/, swapPayload.execute()];
@@ -101,4 +101,4 @@ function orcaApiSwap(path, coin1, coin2) {
         });
     });
 }
-exports.orcaApiSwap = orcaApiSwap;
+exports.orcaApiSwapBuy = orcaApiSwapBuy;
