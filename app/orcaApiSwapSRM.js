@@ -44,11 +44,11 @@ var fs = require('fs');
 var web3_js_1 = require("@solana/web3.js");
 var sdk_1 = require("@orca-so/sdk");
 var decimal_js_1 = __importDefault(require("decimal.js"));
-function orcaApiSwap(path) {
+function orcaApiSwap(path, coin1, coin2) {
     var _this = this;
     return new Promise(function (resolve, reject) {
         var main = function () { return __awaiter(_this, void 0, void 0, function () {
-            var secretKeyString, secretKey, owner, connection, orca, orcaSolPool, orcaToken, orcaAmount, quote, solAmount, swapPayload, swapTxId, err_1;
+            var secretKeyString, secretKey, owner, connection, orca, orcaSolPool, solToken, solAmount, quote, orcaAmount, swapPayload, swapTxId, err_1;
             return __generator(this, function (_a) {
                 switch (_a.label) {
                     case 0:
@@ -67,14 +67,14 @@ function orcaApiSwap(path) {
                     case 1:
                         _a.trys.push([1, 5, , 6]);
                         orcaSolPool = orca.getPool(sdk_1.OrcaPoolConfig.ORCA_SOL);
-                        orcaToken = orcaSolPool.getTokenA();
-                        orcaAmount = new decimal_js_1.default(4.662);
-                        return [4 /*yield*/, orcaSolPool.getQuote(orcaToken, orcaAmount)];
+                        solToken = orcaSolPool.getTokenB();
+                        solAmount = new decimal_js_1.default(0.1);
+                        return [4 /*yield*/, orcaSolPool.getQuote(solToken, solAmount)];
                     case 2:
                         quote = _a.sent();
-                        solAmount = quote.getMinOutputAmount();
-                        console.log("Swap " + orcaAmount.toString() + " orca for at least " + solAmount.toNumber() + " sol");
-                        return [4 /*yield*/, orcaSolPool.swap(owner, orcaToken, orcaAmount, solAmount)];
+                        orcaAmount = quote.getMinOutputAmount();
+                        console.log("Swap " + solAmount.toString() + " SOL for at least " + orcaAmount.toNumber() + " ORCA");
+                        return [4 /*yield*/, orcaSolPool.swap(owner, solToken, solAmount, orcaAmount)];
                     case 3:
                         swapPayload = _a.sent();
                         return [4 /*yield*/, swapPayload.execute()];

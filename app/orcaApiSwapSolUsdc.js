@@ -48,7 +48,7 @@ function orcaApiSwap(path) {
     var _this = this;
     return new Promise(function (resolve, reject) {
         var main = function () { return __awaiter(_this, void 0, void 0, function () {
-            var secretKeyString, secretKey, owner, connection, orca, orcaSolPool, orcaToken, orcaAmount, quote, solAmount, swapPayload, swapTxId, err_1;
+            var secretKeyString, secretKey, owner, connection, orca, solUsdcPool, solToken, solAmount, quote, usdcAmount, swapPayload, swapTxId, err_1;
             return __generator(this, function (_a) {
                 switch (_a.label) {
                     case 0:
@@ -66,15 +66,15 @@ function orcaApiSwap(path) {
                         _a.label = 1;
                     case 1:
                         _a.trys.push([1, 5, , 6]);
-                        orcaSolPool = orca.getPool(sdk_1.OrcaPoolConfig.ORCA_SOL);
-                        orcaToken = orcaSolPool.getTokenA();
-                        orcaAmount = new decimal_js_1.default(4.662);
-                        return [4 /*yield*/, orcaSolPool.getQuote(orcaToken, orcaAmount)];
+                        solUsdcPool = orca.getPool(sdk_1.OrcaPoolConfig.SOL_USDC);
+                        solToken = solUsdcPool.getTokenA();
+                        solAmount = new decimal_js_1.default(0.27);
+                        return [4 /*yield*/, solUsdcPool.getQuote(solToken, solAmount)];
                     case 2:
                         quote = _a.sent();
-                        solAmount = quote.getMinOutputAmount();
-                        console.log("Swap " + orcaAmount.toString() + " orca for at least " + solAmount.toNumber() + " sol");
-                        return [4 /*yield*/, orcaSolPool.swap(owner, orcaToken, orcaAmount, solAmount)];
+                        usdcAmount = quote.getMinOutputAmount();
+                        console.log("Swap " + solAmount.toString() + " sol for at least " + usdcAmount.toNumber() + " usdc");
+                        return [4 /*yield*/, solUsdcPool.swap(owner, solToken, solAmount, usdcAmount)];
                     case 3:
                         swapPayload = _a.sent();
                         return [4 /*yield*/, swapPayload.execute()];

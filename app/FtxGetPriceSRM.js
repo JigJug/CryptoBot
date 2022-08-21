@@ -14,7 +14,7 @@ var endPoint = ftxEndpoint + "/markets/" + pairing;
 ///trades
 var marketData = new FtxApiGetRequest_1.FtxGetHandler(pairing, endPoint);
 marketData.lastEntry = false;
-function doThing() {
+function getSinglePrice() {
     marketData.ftxGetMarket()
         .then(function (ret) {
         console.log(ret.result.price);
@@ -23,7 +23,7 @@ function doThing() {
         console.log(err);
     });
 }
-setInterval(doThing, 5000);
+setInterval(getSinglePrice, 5000);
 //getData().then((data)=>{
 //    const stordatjs = new StoreDataJson('looks', '14400',data)
 //    stordatjs.storeToJson()

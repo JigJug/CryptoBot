@@ -28,14 +28,14 @@ export function orcaApiSwap(path:string){
             try {
                 /*** Swap ***/
                 // 3. We will be swapping 0.1 SOL for some ORCA
-                const orcaSolPool = orca.getPool(OrcaPoolConfig.ORCA_SOL); // get the liquidity pool
-                const orcaToken = orcaSolPool.getTokenA(); //or getTokenB(); // get the token a or b from pool name
-                const orcaAmount = new Decimal(4.662);
-                const quote = await orcaSolPool.getQuote(orcaToken, orcaAmount);
-                const solAmount = quote.getMinOutputAmount();
+                const solUsdcPool = orca.getPool(OrcaPoolConfig.SOL_USDC); // get the liquidity pool
+                const solToken = solUsdcPool.getTokenA(); //or getTokenB(); // get the token a or b from pool name
+                const solAmount = new Decimal(0.27);
+                const quote = await solUsdcPool.getQuote(solToken, solAmount);
+                const usdcAmount = quote.getMinOutputAmount();
           
-                console.log(`Swap ${orcaAmount.toString()} orca for at least ${solAmount.toNumber()} sol`);
-                const swapPayload = await orcaSolPool.swap(owner, orcaToken, orcaAmount, solAmount);
+                console.log(`Swap ${solAmount.toString()} sol for at least ${usdcAmount.toNumber()} usdc`);
+                const swapPayload = await solUsdcPool.swap(owner, solToken, solAmount, usdcAmount);
                 const swapTxId = await swapPayload.execute();
                 console.log("Swapped:", swapTxId, "\n");
           

@@ -19,7 +19,7 @@ const marketData = new FtxGetHandler(pairing, endPoint);
 marketData.lastEntry = false
 
 
-function doThing(){
+function getSinglePrice(){
     marketData.ftxGetMarket()
     .then((ret) => {
         console.log(ret.result.price)
@@ -29,7 +29,7 @@ function doThing(){
     })
 }
 
-setInterval(doThing, 5000)
+setInterval(getSinglePrice, 5000)
 
 //getData().then((data)=>{
 //    const stordatjs = new StoreDataJson('looks', '14400',data)
