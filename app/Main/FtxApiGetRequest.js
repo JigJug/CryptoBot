@@ -1,23 +1,22 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.FtxGetHandler = void 0;
-var NewGetRequest_1 = require("./NewGetRequest");
-var FtxGetHandler = /** @class */ (function () {
-    function FtxGetHandler(marketName, endPoint) {
+const NewGetRequest_1 = require("./NewGetRequest");
+class FtxGetHandler {
+    constructor(marketName, endPoint) {
         this.marketName = marketName;
         this.endPoint = endPoint;
         this.lastEntry = false;
     }
     //methods
-    FtxGetHandler.prototype.ftxGetMarket = function () {
-        var _this = this;
-        return new Promise(function (resolve, reject) {
-            var getReq = new NewGetRequest_1.HttpsGetRequest(_this.endPoint);
+    ftxGetMarket() {
+        return new Promise((resolve, reject) => {
+            const getReq = new NewGetRequest_1.HttpsGetRequest(this.endPoint);
             getReq.httpsGet()
-                .then(function (returnD) {
-                var returnDjson = JSON.parse(returnD);
+                .then((returnD) => {
+                let returnDjson = JSON.parse(returnD);
                 if (returnDjson.success == true) {
-                    if (_this.lastEntry) {
+                    if (this.lastEntry) {
                         resolve(returnDjson.result[returnDjson.result.length - 1]);
                     }
                     else {
@@ -28,12 +27,11 @@ var FtxGetHandler = /** @class */ (function () {
                     reject(new Error("FTX Error1::: " + returnDjson.error));
                 }
             })
-                .catch(function (err) {
-                console.log("ERROR FTXGETREQUEST: " + err);
+                .catch(err => {
+                console.log(`ERROR FTXGETREQUEST: ${err}`);
                 reject(err);
             });
         });
-    };
-    return FtxGetHandler;
-}());
+    }
+}
 exports.FtxGetHandler = FtxGetHandler;

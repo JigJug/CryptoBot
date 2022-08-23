@@ -3,7 +3,7 @@ import { Connection, Keypair } from "@solana/web3.js";
 import { getOrca, OrcaPoolConfig } from "@orca-so/sdk";
 import Decimal from "decimal.js";
 
-export function orcaApiSwapSell(path:string, ammount: number){
+export function orcaApiSwapBuy(path:string, ammount: number){
     return new Promise<number>((resolve, reject) => {
 
         const main = async () => {
@@ -29,16 +29,17 @@ export function orcaApiSwapSell(path:string, ammount: number){
                 /*** Swap ***/
                 // 3. We will be swapping 0.1 SOL for some ORCA
                 const rayUsdcPool = orca.getPool(OrcaPoolConfig.RAY_USDC); // get the liquidity pool
-                const rayToken = rayUsdcPool.getTokenA(); //or getTokenB(); // get the token a or b from pool name
-                const rayAmount = new Decimal(ammount);
-                const quote = await rayUsdcPool.getQuote(rayToken, rayAmount);
-                const usdcAmount = quote.getMinOutputAmount();
+                const usdcToken = rayUsdcPool.getTokenB(); //or getTokenA(); // get the token a or b from pool name
+                const usdcAmount = new Decimal(ammount);
+                const slippage = new Decimal(0.05)
+                const quote = await rayUsdcPool.getQuote(usdcToken, usdcAmount, slippage);
+                const rayAmount = quote.getMinOutputAmount();
           
-                console.log(`Swap ${rayAmount.toString()} ray for at least ${usdcAmount.toNumber()} usdc`);
-                const swapPayload = await rayUsdcPool.swap(owner, rayToken, rayAmount, usdcAmount);
+                console.log(`Swap ${usdcAmount.toString()} usdc for at least ${rayAmount.toNumber()} ray`);
+                const swapPayload = await rayUsdcPool.swap(owner, usdcToken, usdcAmount, rayAmount);
                 const swapTxId = await swapPayload.execute();
                 console.log("Swapped:", swapTxId, "\n");
-                let returnNum = Math.trunc(usdcAmount.toNumber())
+                let returnNum = Math.trunc(rayAmount.toNumber())
                 resolve(returnNum);
           
           
@@ -50,12 +51,11 @@ export function orcaApiSwapSell(path:string, ammount: number){
           
         main()
         .then(() => {
-            console.log("finished orca transaction");
-            //resolve()
+            console.log("Done");
         })
         .catch((e) => {
             console.error(e);
-            reject();
+            reject()
         });
 
     })

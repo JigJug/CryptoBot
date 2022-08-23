@@ -1,4 +1,4 @@
-import {FtxGetHandler} from './FtxApiGetRequest'
+import {FtxGetHandler} from '../Main/FtxApiGetRequest'
 
 
 let dateTime = new Date();

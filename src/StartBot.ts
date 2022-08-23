@@ -1,4 +1,4 @@
-import { CryptoTradingBot } from "./CryptoTradingBot";
+import { CryptoTradingBot } from "./Main/CryptoTradingBot";
 const fs = require('fs')
 
 let windowResolution: string = '14400'//4h

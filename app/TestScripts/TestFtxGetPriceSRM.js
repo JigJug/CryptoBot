@@ -1,25 +1,25 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-var FtxApiGetRequest_1 = require("./FtxApiGetRequest");
-var dateTime = new Date();
+const FtxApiGetRequest_1 = require("../Main/FtxApiGetRequest");
+let dateTime = new Date();
 //let h = addZero(dateTime.getUTCHours());
 //let m = addZero(dateTime.getUTCMinutes());
-var s = dateTime.getUTCSeconds();
+let s = dateTime.getUTCSeconds();
 console.log(s);
-var windowResolution = '14400'; //4h
-var pairing = 'SRM/USD';
-var pairing1 = pairing.replace('/', '');
-var ftxEndpoint = "https://ftx.com/api";
-var endPoint = ftxEndpoint + "/markets/" + pairing;
+let windowResolution = '14400'; //4h
+let pairing = 'SRM/USD';
+let pairing1 = pairing.replace('/', '');
+let ftxEndpoint = `https://ftx.com/api`;
+let endPoint = `${ftxEndpoint}/markets/${pairing}`;
 ///trades
-var marketData = new FtxApiGetRequest_1.FtxGetHandler(pairing, endPoint);
+const marketData = new FtxApiGetRequest_1.FtxGetHandler(pairing, endPoint);
 marketData.lastEntry = false;
 function getSinglePrice() {
     marketData.ftxGetMarket()
-        .then(function (ret) {
+        .then((ret) => {
         console.log(ret.result.price);
     })
-        .catch(function (err) {
+        .catch((err) => {
         console.log(err);
     });
 }

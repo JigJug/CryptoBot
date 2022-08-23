@@ -19,47 +19,47 @@ var __importStar = (this && this.__importStar) || function (mod) {
     return result;
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-var FtxApiGetRequest_1 = require("./FtxApiGetRequest");
-var StoreDataToJson_1 = require("./StoreDataToJson");
-var EMA_1 = require("./EMA");
-var readline = __importStar(require("readline"));
-var rl = readline.createInterface({
+const FtxApiGetRequest_1 = require("./Main/FtxApiGetRequest");
+const StoreDataToJson_1 = require("./Main/StoreDataToJson");
+const EMA_1 = require("./Main/EMA");
+const readline = __importStar(require("readline"));
+let rl = readline.createInterface({
     input: process.stdin,
     output: process.stdout
 });
-var pairing; // 'SRM/USD'
-var windowResolution; // = '14400'//4h
-rl.question('Enter market: <COIN/PAIRING> ', function (answer) {
+let pairing; // 'SRM/USD'
+let windowResolution; // = '14400'//4h
+rl.question('Enter market: <COIN/PAIRING> ', (answer) => {
     pairing = answer;
-    rl.question('Enter window resolution <14400> (4h)', function (answer2) {
+    rl.question('Enter window resolution <14400> (4h)', (answer2) => {
         windowResolution = answer2;
-        var pairing1 = pairing.replace('/', '');
-        var emaPeriod = 70;
-        var ftxEndpoint = "https://ftx.com/api";
-        var endPoint = ftxEndpoint + "/markets/" + pairing + "/candles?resolution=" + windowResolution;
-        var marketData = new FtxApiGetRequest_1.FtxGetHandler(pairing, endPoint);
+        let pairing1 = pairing.replace('/', '');
+        let emaPeriod = 70;
+        let ftxEndpoint = `https://ftx.com/api`;
+        let endPoint = `${ftxEndpoint}/markets/${pairing}/candles?resolution=${windowResolution}`;
+        const marketData = new FtxApiGetRequest_1.FtxGetHandler(pairing, endPoint);
         //set to true to return the last data entry/ false to get all data
         marketData.lastEntry = false;
         marketData.ftxGetMarket()
-            .then(function (ret) {
+            .then((ret) => {
             return calcEmaStoreData(ret, emaPeriod, pairing1);
         })
-            .then(function () {
+            .then(() => {
             console.log("complete");
         })
-            .catch(function (err) { console.log(err); });
+            .catch(err => { console.log(err); });
         rl.close();
     });
 });
 function calcEmaStoreData(ret, emaPeriod, pairing1) {
-    return new Promise(function (resolve, reject) {
-        var emaYesterday;
-        var priceToday;
-        var getEMA = new EMA_1.EMA(emaPeriod, ret.result);
+    return new Promise((resolve, reject) => {
+        let emaYesterday;
+        let priceToday;
+        const getEMA = new EMA_1.EMA(emaPeriod, ret.result);
         emaYesterday = getEMA.smaCalc();
         console.log(emaYesterday);
         ret.result[emaPeriod].ema = emaYesterday;
-        var calcEma = function (currentValue, index) {
+        const calcEma = (currentValue, index) => {
             if (index > emaPeriod) {
                 priceToday = currentValue.close;
                 currentValue.ema = getEMA.emaCalc(priceToday, emaYesterday);
@@ -67,13 +67,13 @@ function calcEmaStoreData(ret, emaPeriod, pairing1) {
             }
             return currentValue;
         };
-        var addedEma = ret.result.map(calcEma);
+        let addedEma = ret.result.map(calcEma);
         //send store data to json (filename: coin + time)
-        var newJson = new StoreDataToJson_1.StoreDataJson('D:\\CryptoProject\\DataCollector\\MarketData\\', pairing1, windowResolution, addedEma);
-        newJson.storeToJson().then(function () {
+        let newJson = new StoreDataToJson_1.StoreDataJson('D:\\CryptoProject\\DataCollector\\MarketData\\', pairing1, windowResolution, addedEma);
+        newJson.storeToJson().then(() => {
             resolve();
         })
-            .catch(function (err) {
+            .catch((err) => {
             reject(err);
         });
     });

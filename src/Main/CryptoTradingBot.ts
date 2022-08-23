@@ -1,7 +1,7 @@
 import { EMA } from './EMA'
 import {FtxGetHandler} from './FtxApiGetRequest'
-import { orcaApiSwapSell } from './orcaApiSwapRayUsdcSell'
-import { orcaApiSwapBuy } from './orcaApiSwapUsdcRayBuy'
+import { orcaApiSwapSell } from '../OrcaSwaps/orcaApiSwapRayUsdcSell'
+import { orcaApiSwapBuy } from '../OrcaSwaps/orcaApiSwapUsdcRayBuy'
 import { StoreDataJson } from './StoreDataToJson'
 const fs = require('fs')
 

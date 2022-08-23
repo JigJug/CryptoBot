@@ -1,6 +1,6 @@
-import { FtxGetHandler } from './FtxApiGetRequest'
-import { StoreDataJson } from './StoreDataToJson';
-import {EMA} from './EMA';
+import { FtxGetHandler } from './Main/FtxApiGetRequest'
+import { StoreDataJson } from './Main/StoreDataToJson';
+import {EMA} from './Main/EMA';
 import * as readline from 'readline';
 
 let rl = readline.createInterface({
