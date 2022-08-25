@@ -34,7 +34,7 @@ function orcaApiSwapSell(path, ammount) {
             const owner = web3_js_1.Keypair.fromSecretKey(secretKey);
             // 2. Initialzie Orca object with mainnet connection
             const connection = new web3_js_1.Connection("https://api.mainnet-beta.solana.com", "singleGossip");
-            const orca = sdk_1.getOrca(connection);
+            const orca = (0, sdk_1.getOrca)(connection);
             try {
                 /*** Swap ***/
                 // 3. We will be swapping 0.1 SOL for some ORCA

@@ -8,11 +8,11 @@ type FtxApiObject = {
 
 export class FtxGetHandler {
 
-    marketName: String
-    endPoint: String
-    lastEntry: boolean
+    marketName: string | null
+    endPoint: string | null
+    lastEntry: boolean | null
 
-    constructor(marketName: String, endPoint: String){
+    constructor(marketName: string | null, endPoint: string | null){
         this.marketName = marketName
         this.endPoint = endPoint
         this.lastEntry = false

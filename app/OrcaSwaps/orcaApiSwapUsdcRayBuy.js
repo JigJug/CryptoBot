@@ -34,11 +34,11 @@ function orcaApiSwapBuy(path, ammount) {
             const owner = web3_js_1.Keypair.fromSecretKey(secretKey);
             // 2. Initialzie Orca object with mainnet connection
             const connection = new web3_js_1.Connection("https://api.mainnet-beta.solana.com", "singleGossip");
-            const orca = sdk_1.getOrca(connection);
+            const orca = (0, sdk_1.getOrca)(connection);
             try {
                 /*** Swap ***/
                 // 3. We will be swapping 0.1 SOL for some ORCA
-                const rayUsdcPool = orca.getPool(sdk_1.OrcaPoolConfig.RAY_SOL); // get the liquidity pool
+                const rayUsdcPool = orca.getPool(sdk_1.OrcaPoolConfig.RAY_USDC); // get the liquidity pool
                 const usdcToken = rayUsdcPool.getTokenB(); //or getTokenA(); // get the token a or b from pool name
                 const usdcAmount = new decimal_js_1.default(ammount);
                 const slippage = new decimal_js_1.default(0.05);

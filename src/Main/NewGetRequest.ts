@@ -2,9 +2,9 @@ const https = require('https');
 
 export class HttpsGetRequest {
 
-    endPoint: String
+    endPoint: string | null
 
-    constructor (endPoint: String){
+    constructor (endPoint: string | null){
 
         this.endPoint = endPoint;
     }

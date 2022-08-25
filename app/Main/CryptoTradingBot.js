@@ -99,7 +99,7 @@ class CryptoTradingBot {
             if (this.price > this.emaYesterday) {
                 if (this.buySellTrigger && this.sold) {
                     this.buySellTrigger = false;
-                    orcaApiSwapUsdcRayBuy_1.orcaApiSwapBuy(this.secretkeyPath, this.ammountUsdc)
+                    (0, orcaApiSwapUsdcRayBuy_1.orcaApiSwapBuy)(this.secretkeyPath, this.ammountUsdc)
                         .then((ammount) => {
                         this.ammountCoin = ammount;
                         this.buySellTrigger = true;
@@ -120,7 +120,7 @@ class CryptoTradingBot {
             if (this.price < this.emaYesterday) {
                 if (this.buySellTrigger && this.bought) {
                     this.buySellTrigger = false;
-                    orcaApiSwapRayUsdcSell_1.orcaApiSwapSell(this.secretkeyPath, this.ammountUsdc)
+                    (0, orcaApiSwapRayUsdcSell_1.orcaApiSwapSell)(this.secretkeyPath, this.ammountUsdc)
                         .then((ammount) => {
                         this.ammountUsdc = ammount;
                         this.buySellTrigger = true;
