@@ -25,7 +25,7 @@ export interface TradingBotDynamicDataType{
 }
 
 //bot config
-export const TradingBotConfig: TradingBotConfigType = {
+export const TradingBotConfig: any = {
     pairing: '',
     priceEndPoint: '',
     marketDataEndpoint: '',
@@ -34,7 +34,7 @@ export const TradingBotConfig: TradingBotConfigType = {
 }
 
 //bot dynamic data
-export const TradingBotDynamicData: TradingBotDynamicDataType = {
+export const TradingBotDynamicData: any = {
     marketData: null,
     price: null,
     emaYesterday: null,
@@ -45,18 +45,18 @@ export const TradingBotDynamicData: TradingBotDynamicDataType = {
     ammountCoin: null
 }
 //bot functions
-export const TradingBotGetters = {
+/*export const TradingBotGetters = {
     getPrice: function (pairing: string, priceEndpoint: string) {
         return fetchPrice(pairing, priceEndpoint);
     },
     getFourHourData: function (TradingBotConfig: TradingBotConfigType) {
         return fetchFourHourData(TradingBotConfig)
     }
-}
+}*/
 
 //METHODS
 //price
-function fetchPrice(pairing: string, priceEndpoint: string){
+/*function fetchPrice(pairing: string, priceEndpoint: string){
     return new Promise<number>((resolve, reject) => {
         const price = new FtxGetHandler(pairing, priceEndpoint);
         price.ftxGetMarket()
@@ -69,10 +69,10 @@ function fetchPrice(pairing: string, priceEndpoint: string){
             reject(err)
         })
     })
-}
+}*/
 
 
-function fetchFourHourData(pairing: string, marketDataEndpoint: string, emaYesterday: number, timeDiff: number, fourHour: number){
+/*function fetchFourHourData(pairing: string, marketDataEndpoint: string, emaYesterday: number, timeDiff: number, fourHour: number){
     return new Promise<any>((resolve, reject) => {
         const newMdSet = new FtxGetHandler(pairing, marketDataEndpoint);
         newMdSet.lastEntry = true
@@ -104,4 +104,4 @@ function fetchFourHourData(pairing: string, marketDataEndpoint: string, emaYeste
 
     })
 
-}
+}*/

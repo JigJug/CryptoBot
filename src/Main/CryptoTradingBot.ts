@@ -111,10 +111,10 @@ export class CryptoTradingBot {
                     const storeJson = new StoreDataJson(
                         this.jsonPath,
                         this.pairing.replace('/', ''),
-                        '14400',
-                        this.marketData
+                        '14400'
+                        
                     );
-                    storeJson.storeToJson();
+                    storeJson.storeToJson(this.marketData);
                 })
                 .catch((err) => {
                     console.log(err)

@@ -8,34 +8,36 @@ export class StoreDataJson {
   path: string
   name1: string
   name2: string
-  data 
+  //data 
 
   constructor(
     path: string,
     name1: string,
     name2: string,
-    data: any
+    //data: any
   ){
     this.path = path
     this.name1 = name1
     this.name2 = name2
-    this.data = data
+    //this.data = data
   }
 
-  storeToJson(){
+  storeToJson(data: []){
 
     return new Promise<void>((resolve, reject)=>{
 
       let fileName = `${this.path}${this.name1}${this.name2}.json`
 
-      this.data = JSON.stringify(this.data, null, 2);
+      let dataStr = JSON.stringify(data, null, 2);
 
-      fs.writeFile(fileName, this.data, (err) => {
+      fs.writeFile(fileName, dataStr, (err) => {
         if (err) {
           reject(err)
+        }else {
+          console.log('Data written to file');
+          resolve()
         }
-        console.log('Data written to file');
-        resolve()
+
       });
 
     });

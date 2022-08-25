@@ -73,8 +73,8 @@ function calcEmaStoreData(ret, emaPeriod, pairing1) {
         };
         let addedEma = ret.result.map(calcEma);
         //send store data to json (filename: coin + time)
-        let newJson = new StoreDataToJson_1.StoreDataJson('D:\\CryptoProject\\DataCollector\\MarketData\\', pairing1, windowResolution, addedEma);
-        newJson.storeToJson().then(() => {
+        let newJson = new StoreDataToJson_1.StoreDataJson('D:\\projs\\DataCollector\\MarketData\\', pairing1, windowResolution);
+        newJson.storeToJson(addedEma).then(() => {
             resolve();
         })
             .catch((err) => {

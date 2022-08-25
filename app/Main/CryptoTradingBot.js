@@ -74,8 +74,8 @@ class CryptoTradingBot {
                     md.ema = newEma.emaCalc(md.close, this.emaYesterday);
                     this.emaYesterday = md.ema;
                     this.marketData.push(md);
-                    const storeJson = new StoreDataToJson_1.StoreDataJson(this.jsonPath, this.pairing.replace('/', ''), '14400', this.marketData);
-                    storeJson.storeToJson();
+                    const storeJson = new StoreDataToJson_1.StoreDataJson(this.jsonPath, this.pairing.replace('/', ''), '14400');
+                    storeJson.storeToJson(this.marketData);
                 })
                     .catch((err) => {
                     console.log(err);

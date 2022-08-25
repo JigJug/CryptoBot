@@ -6,22 +6,25 @@ const fs = require("fs");
 data to json
 */
 class StoreDataJson {
-    constructor(path, name1, name2, data) {
+    //data 
+    constructor(path, name1, name2) {
         this.path = path;
         this.name1 = name1;
         this.name2 = name2;
-        this.data = data;
+        //this.data = data
     }
-    storeToJson() {
+    storeToJson(data) {
         return new Promise((resolve, reject) => {
             let fileName = `${this.path}${this.name1}${this.name2}.json`;
-            this.data = JSON.stringify(this.data, null, 2);
-            fs.writeFile(fileName, this.data, (err) => {
+            let dataStr = JSON.stringify(data, null, 2);
+            fs.writeFile(fileName, dataStr, (err) => {
                 if (err) {
                     reject(err);
                 }
-                console.log('Data written to file');
-                resolve();
+                else {
+                    console.log('Data written to file');
+                    resolve();
+                }
             });
         });
     }
