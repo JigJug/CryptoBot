@@ -40,7 +40,7 @@ TradingBotConfig.secretkeyPath = secretKeyPath;
 //************************************************************************************************************************
 //PRICE AND EMA AND ROUTINE CHECKING
 TradingBotDynamicData.buySellTrigger = true
-TradingBotDynamicData.bought = false
+TradingBotDynamicData.bought = true
 TradingBotDynamicData.sold = false
 
 //check price every 3 seconds
@@ -88,7 +88,7 @@ let fourHour = 1000 * 60;
 const storeJson = new StoreDataJson(
     TradingBotConfig.jsonPath,
     TradingBotConfig.pairing.replace('/', ''),
-    '14400'
+    '60'
 );
     
 setInterval(startFourHourData, 30000)
@@ -138,10 +138,14 @@ setInterval(()=>{
                 TradingBotDynamicData.ammountCoin = ammount
                 TradingBotDynamicData.buySellTrigger = true
                 TradingBotDynamicData.bought = true
+                TradingBotDynamicData.sold = false
                 
             })
             .catch((err) => {
                 console.log(err);
+                TradingBotDynamicData.buySellTrigger = true
+                TradingBotDynamicData.bought = true
+                TradingBotDynamicData.sold = false
             });
         }
     }
@@ -157,9 +161,13 @@ setInterval(()=>{
                 TradingBotDynamicData.ammountUsdc = ammount
                 TradingBotDynamicData.buySellTrigger = true
                 TradingBotDynamicData.sold = true
+                TradingBotDynamicData.bought = false
             })
             .catch((err) => {
                 console.log(err);
+                TradingBotDynamicData.buySellTrigger = true
+                TradingBotDynamicData.sold = true
+                TradingBotDynamicData.bought = false
             });
         }
     }

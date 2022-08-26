@@ -40,7 +40,7 @@ CryptoTradingBotNoClass_1.TradingBotConfig.secretkeyPath = secretKeyPath;
 //************************************************************************************************************************
 //PRICE AND EMA AND ROUTINE CHECKING
 CryptoTradingBotNoClass_1.TradingBotDynamicData.buySellTrigger = true;
-CryptoTradingBotNoClass_1.TradingBotDynamicData.bought = false;
+CryptoTradingBotNoClass_1.TradingBotDynamicData.bought = true;
 CryptoTradingBotNoClass_1.TradingBotDynamicData.sold = false;
 //check price every 3 seconds
 const price = new FtxApiGetRequest_1.FtxGetHandler(CryptoTradingBotNoClass_1.TradingBotConfig.pairing, CryptoTradingBotNoClass_1.TradingBotConfig.priceEndPoint);
@@ -120,9 +120,13 @@ CryptoTradingBotNoClass_1.TradingBotDynamicData.ammountUsdc = 200;
                 CryptoTradingBotNoClass_1.TradingBotDynamicData.ammountCoin = ammount;
                 CryptoTradingBotNoClass_1.TradingBotDynamicData.buySellTrigger = true;
                 CryptoTradingBotNoClass_1.TradingBotDynamicData.bought = true;
+                CryptoTradingBotNoClass_1.TradingBotDynamicData.sold = false;
             })
                 .catch((err) => {
                 console.log(err);
+                CryptoTradingBotNoClass_1.TradingBotDynamicData.buySellTrigger = true;
+                CryptoTradingBotNoClass_1.TradingBotDynamicData.bought = true;
+                CryptoTradingBotNoClass_1.TradingBotDynamicData.sold = false;
             });
         }
     }
@@ -136,9 +140,13 @@ CryptoTradingBotNoClass_1.TradingBotDynamicData.ammountUsdc = 200;
                 CryptoTradingBotNoClass_1.TradingBotDynamicData.ammountUsdc = ammount;
                 CryptoTradingBotNoClass_1.TradingBotDynamicData.buySellTrigger = true;
                 CryptoTradingBotNoClass_1.TradingBotDynamicData.sold = true;
+                CryptoTradingBotNoClass_1.TradingBotDynamicData.bought = false;
             })
                 .catch((err) => {
                 console.log(err);
+                CryptoTradingBotNoClass_1.TradingBotDynamicData.buySellTrigger = true;
+                CryptoTradingBotNoClass_1.TradingBotDynamicData.sold = true;
+                CryptoTradingBotNoClass_1.TradingBotDynamicData.bought = false;
             });
         }
     }
