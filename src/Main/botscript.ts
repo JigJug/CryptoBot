@@ -9,7 +9,7 @@ const fs = require('fs')
 
 //************************************************************************************************************************
 //SET UP TRADINGBOT 
-let windowResolution: string = '14400'//4h
+let windowResolution: string = '60'//4h
 let pairing: string = 'RAY/USD'
 let pairing1: string = pairing.replace('/', '')
 let ftxEndpoint: string = `https://ftx.com/api`;
@@ -174,17 +174,14 @@ setInterval(()=>{
 //test everything
 setInterval(() => {
     console.log("TradingBotDynamicData.price " + TradingBotDynamicData.price)
-    console.log('\n')
+    //console.log('\n')
     console.log("TradingBotDynamicData.emaYesterday " + TradingBotDynamicData.emaYesterday)
-    console.log('\n')
+    //console.log('\n')
     console.log("TradingBotDynamicData.buySellTrigger " + TradingBotDynamicData.buySellTrigger)
-    console.log('\n')
+    //console.log('\n')
     console.log("TradingBotDynamicData.bought " + TradingBotDynamicData.bought)
-    console.log('\n')
+    //console.log('\n')
     console.log("TradingBotDynamicData.sold " + TradingBotDynamicData.sold)
-    console.log('\n')
-
-    console.log("TradingBotDynamicData.price " + TradingBotDynamicData.price)
     console.log('\n')
 }, 10000)
 

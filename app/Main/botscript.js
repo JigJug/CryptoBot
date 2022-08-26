@@ -10,7 +10,7 @@ const orcaApiSwapUsdcRayBuy_1 = require("../OrcaSwaps/orcaApiSwapUsdcRayBuy");
 const fs = require('fs');
 //************************************************************************************************************************
 //SET UP TRADINGBOT 
-let windowResolution = '14400'; //4h
+let windowResolution = '60'; //4h
 let pairing = 'RAY/USD';
 let pairing1 = pairing.replace('/', '');
 let ftxEndpoint = `https://ftx.com/api`;
@@ -146,15 +146,13 @@ CryptoTradingBotNoClass_1.TradingBotDynamicData.ammountUsdc = 200;
 //test everything
 (0, timers_1.setInterval)(() => {
     console.log("TradingBotDynamicData.price " + CryptoTradingBotNoClass_1.TradingBotDynamicData.price);
-    console.log('\n');
+    //console.log('\n')
     console.log("TradingBotDynamicData.emaYesterday " + CryptoTradingBotNoClass_1.TradingBotDynamicData.emaYesterday);
-    console.log('\n');
+    //console.log('\n')
     console.log("TradingBotDynamicData.buySellTrigger " + CryptoTradingBotNoClass_1.TradingBotDynamicData.buySellTrigger);
-    console.log('\n');
+    //console.log('\n')
     console.log("TradingBotDynamicData.bought " + CryptoTradingBotNoClass_1.TradingBotDynamicData.bought);
-    console.log('\n');
+    //console.log('\n')
     console.log("TradingBotDynamicData.sold " + CryptoTradingBotNoClass_1.TradingBotDynamicData.sold);
-    console.log('\n');
-    console.log("TradingBotDynamicData.price " + CryptoTradingBotNoClass_1.TradingBotDynamicData.price);
     console.log('\n');
 }, 10000);

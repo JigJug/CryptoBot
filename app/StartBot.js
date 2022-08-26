@@ -8,8 +8,9 @@ let pairing1 = pairing.replace('/', '');
 let ftxEndpoint = `https://ftx.com/api`;
 let endPoint = `${ftxEndpoint}/markets/${pairing}`;
 let marketDataEndpoint = `${ftxEndpoint}/markets/${pairing}/candles?resolution=${windowResolution}`;
-let path = 'D:\\CryptoProject\\DataCollector\\MarketData\\';
-let data = fs.readFileSync(path, "utf8", (err, data) => {
+let path = 'D:\\projs\\DataCollector\\MarketData\\';
+let jsonPath = 'D:\\projs\\DataCollector\\MarketData\\RAYUSD14400.json';
+let data = fs.readFileSync(jsonPath, "utf8", (err, data) => {
     if (err) {
         console.log(err);
     }

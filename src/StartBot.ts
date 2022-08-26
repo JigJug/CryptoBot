@@ -9,9 +9,10 @@ let endPoint = `${ftxEndpoint}/markets/${pairing}`
 
 let marketDataEndpoint = `${ftxEndpoint}/markets/${pairing}/candles?resolution=${windowResolution}`
 
-let path = 'D:\\CryptoProject\\DataCollector\\MarketData\\'
+let path = 'D:\\projs\\DataCollector\\MarketData\\'
+let jsonPath = 'D:\\projs\\DataCollector\\MarketData\\RAYUSD14400.json'
 
-let data = fs.readFileSync(path, "utf8", (err: Error, data: any)=>{
+let data = fs.readFileSync(jsonPath, "utf8", (err: Error, data: any)=>{
     if(err){
         console.log(err)
     }
