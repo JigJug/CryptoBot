@@ -104,6 +104,7 @@ class CryptoTradingBot {
                         this.ammountCoin = ammount;
                         this.buySellTrigger = true;
                         this.bought = true;
+                        this.sold = false;
                     })
                         .catch((err) => {
                         console.log(err);
@@ -125,6 +126,7 @@ class CryptoTradingBot {
                         this.ammountUsdc = ammount;
                         this.buySellTrigger = true;
                         this.sold = true;
+                        this.bought = false;
                     })
                         .catch((err) => {
                         console.log(err);
