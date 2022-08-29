@@ -1,6 +1,6 @@
-import { EMA } from './EMA'
-import { orcaApiSwapSell } from './orcaApiSwapRayUsdcSell'
-import { orcaApiSwapBuy } from './orcaApiSwapUsdcRayBuy'
+import { EMA } from '../Main/EMA'
+import { orcaApiSwapSell } from '../OrcaSwaps/orcaApiSwapRayUsdcSell'
+import { orcaApiSwapBuy } from '../OrcaSwaps/orcaApiSwapUsdcRayBuy'
 import { EmiterCollection } from './EmiterCollection'
 
 
@@ -129,7 +129,7 @@ export class CryptoTradingBot {
             this.buySellTrigger = true
             this.bought = true         
         })
-        .catch((err) => {
+        .catch((err: Error) => {
             console.log(err);
         });
     }
@@ -147,7 +147,7 @@ export class CryptoTradingBot {
             this.buySellTrigger = true
             this.sold = true
         })
-        .catch((err) => {
+        .catch((err: Error) => {
             console.log(err);
         });
     }

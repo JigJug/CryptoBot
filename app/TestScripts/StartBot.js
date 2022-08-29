@@ -1,6 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-const CryptoTradingBot_1 = require("./Main/CryptoTradingBot");
+const CryptoTradingBot_1 = require("../Main/CryptoTradingBot");
 const fs = require('fs');
 let windowResolution = '14400'; //4h
 let pairing = 'RAY/USD';

@@ -1,12 +1,12 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.FtxClient = void 0;
-const NewGetRequest_1 = require("./NewGetRequest");
+const NewUpdateGetRequest_1 = require("./NewUpdateGetRequest");
 class FtxClient {
     constructor(marketName, windowResolution) {
         this.marketName = marketName;
         this.windowResolution = windowResolution;
-        this.getReq = new NewGetRequest_1.HttpsGetRequest().httpsGet;
+        this.getReq = new NewUpdateGetRequest_1.HttpsGetRequest().httpsGet;
         this.ftxEndpoint = `https://ftx.com/api`;
         this.priceEndpoint = `${this.ftxEndpoint}/markets/${this.marketName}`;
         this.marketDataEndPoint = `${this.priceEndpoint}/candles?resolution=${windowResolution}`;

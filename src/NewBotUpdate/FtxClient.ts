@@ -1,4 +1,4 @@
-import { HttpsGetRequest } from "./NewGetRequest";
+import { HttpsGetRequest } from "./NewUpdateGetRequest";
 
 //ftx get response type
 type FtxApiObject = {

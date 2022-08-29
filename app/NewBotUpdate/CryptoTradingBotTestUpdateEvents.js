@@ -1,9 +1,9 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.CryptoTradingBot = void 0;
-const EMA_1 = require("./EMA");
-const orcaApiSwapRayUsdcSell_1 = require("./orcaApiSwapRayUsdcSell");
-const orcaApiSwapUsdcRayBuy_1 = require("./orcaApiSwapUsdcRayBuy");
+const EMA_1 = require("../Main/EMA");
+const orcaApiSwapRayUsdcSell_1 = require("../OrcaSwaps/orcaApiSwapRayUsdcSell");
+const orcaApiSwapUsdcRayBuy_1 = require("../OrcaSwaps/orcaApiSwapUsdcRayBuy");
 const EmiterCollection_1 = require("./EmiterCollection");
 class CryptoTradingBot {
     constructor(pairing, windowResolution, marketData, jsonPath, secretkeyPath, ammountUsdc, price) {
