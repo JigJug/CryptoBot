@@ -8,7 +8,6 @@ export class CryptoTradingBot {
     pairing
     windowResolution
     marketData
-    jsonPath
     secretkeyPath
     ammountUsdc
     price
@@ -18,12 +17,12 @@ export class CryptoTradingBot {
     sold
     ammountCoin
     dataEmiters
+    ema
     
     constructor(
         pairing: string,
         windowResolution: string,
         marketData: any,
-        jsonPath: string,
         secretkeyPath: string,
         ammountUsdc: number,
         price: number
@@ -31,7 +30,6 @@ export class CryptoTradingBot {
         this.pairing = pairing
         this.windowResolution = windowResolution
         this.marketData = marketData
-        this.jsonPath = jsonPath
         this.secretkeyPath = secretkeyPath
         this.ammountUsdc = ammountUsdc
         this.price = price
@@ -41,6 +39,7 @@ export class CryptoTradingBot {
         this.sold = true
         this.ammountCoin = 0
         this.dataEmiters = new EmiterCollection(this.pairing, this.windowResolution)
+        this.ema = new EMA(70, [])
     }
 
     startBot(){
@@ -61,7 +60,7 @@ export class CryptoTradingBot {
         this.dataEmiters.sendPrice();
         this.dataEmiters.on('Price', (price: number) => {
             this.price = price;
-            this.buySellLigic(price, this.marketData.ema);
+            this.buySellLogic(price, this.marketData.ema);
         })
 
     }
@@ -79,18 +78,8 @@ export class CryptoTradingBot {
         let lastTime = this.marketData[lastIndex].time
         this.dataEmiters.sendFourHourData(lastTime);
         this.dataEmiters.on('FourHourData', (md: any) => {
-            //calc ema
-            const newEma = new EMA(70, []);
-            md.ema = newEma.emaCalc(md.close, this.marketData.ema);
-            //assign new marketData
-            this.marketData.startTime = md.startTime
-            this.marketData.time = md.time
-            this.marketData.open = md.open
-            this.marketData.high = md.high
-            this.marketData.low = md.low
-            this.marketData.close = md.close
-            this.marketData.volume = md.volume
-            this.marketData.ema = md.ema
+            this.calcEma(md.close, this.marketData.ema);
+            this.updateMarketData(md);
             console.log('updated market data: \n' + this.marketData);
         })
 
@@ -98,10 +87,9 @@ export class CryptoTradingBot {
 
 
 
-
     //buying and selling
 
-    buySellLigic(price: number, emaYesterday: number){
+    buySellLogic(price: number, emaYesterday: number){
         //buy
         if(price > emaYesterday){
             if(this.buySellTrigger && this.sold){
@@ -154,4 +142,19 @@ export class CryptoTradingBot {
 
 
 
+    calcEma(close: number, emaYesterday: number){
+        const ema = this.ema;
+        return ema.emaCalc(close, emaYesterday);
+    }
+
+    updateMarketData(md: any){
+        this.marketData.startTime = md.startTime
+        this.marketData.time = md.time
+        this.marketData.open = md.open
+        this.marketData.high = md.high
+        this.marketData.low = md.low
+        this.marketData.close = md.close
+        this.marketData.volume = md.volume
+        this.marketData.ema = md.ema
+    }
 }

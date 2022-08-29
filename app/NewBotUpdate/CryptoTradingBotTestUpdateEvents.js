@@ -6,11 +6,10 @@ const orcaApiSwapRayUsdcSell_1 = require("../OrcaSwaps/orcaApiSwapRayUsdcSell");
 const orcaApiSwapUsdcRayBuy_1 = require("../OrcaSwaps/orcaApiSwapUsdcRayBuy");
 const EmiterCollection_1 = require("./EmiterCollection");
 class CryptoTradingBot {
-    constructor(pairing, windowResolution, marketData, jsonPath, secretkeyPath, ammountUsdc, price) {
+    constructor(pairing, windowResolution, marketData, secretkeyPath, ammountUsdc, price) {
         this.pairing = pairing;
         this.windowResolution = windowResolution;
         this.marketData = marketData;
-        this.jsonPath = jsonPath;
         this.secretkeyPath = secretkeyPath;
         this.ammountUsdc = ammountUsdc;
         this.price = price;
@@ -19,6 +18,7 @@ class CryptoTradingBot {
         this.sold = true;
         this.ammountCoin = 0;
         this.dataEmiters = new EmiterCollection_1.EmiterCollection(this.pairing, this.windowResolution);
+        this.ema = new EMA_1.EMA(70, []);
     }
     startBot() {
         return this.setStartBot();
@@ -35,7 +35,7 @@ class CryptoTradingBot {
         this.dataEmiters.sendPrice();
         this.dataEmiters.on('Price', (price) => {
             this.price = price;
-            this.buySellLigic(price, this.marketData.ema);
+            this.buySellLogic(price, this.marketData.ema);
         });
     }
     testPrice() {
@@ -50,23 +50,13 @@ class CryptoTradingBot {
         let lastTime = this.marketData[lastIndex].time;
         this.dataEmiters.sendFourHourData(lastTime);
         this.dataEmiters.on('FourHourData', (md) => {
-            //calc ema
-            const newEma = new EMA_1.EMA(70, []);
-            md.ema = newEma.emaCalc(md.close, this.marketData.ema);
-            //assign new marketData
-            this.marketData.startTime = md.startTime;
-            this.marketData.time = md.time;
-            this.marketData.open = md.open;
-            this.marketData.high = md.high;
-            this.marketData.low = md.low;
-            this.marketData.close = md.close;
-            this.marketData.volume = md.volume;
-            this.marketData.ema = md.ema;
+            this.calcEma(md.close, this.marketData.ema);
+            this.updateMarketData(md);
             console.log('updated market data: \n' + this.marketData);
         });
     }
     //buying and selling
-    buySellLigic(price, emaYesterday) {
+    buySellLogic(price, emaYesterday) {
         //buy
         if (price > emaYesterday) {
             if (this.buySellTrigger && this.sold) {
@@ -108,6 +98,20 @@ class CryptoTradingBot {
             .catch((err) => {
             console.log(err);
         });
+    }
+    calcEma(close, emaYesterday) {
+        const ema = this.ema;
+        return ema.emaCalc(close, emaYesterday);
+    }
+    updateMarketData(md) {
+        this.marketData.startTime = md.startTime;
+        this.marketData.time = md.time;
+        this.marketData.open = md.open;
+        this.marketData.high = md.high;
+        this.marketData.low = md.low;
+        this.marketData.close = md.close;
+        this.marketData.volume = md.volume;
+        this.marketData.ema = md.ema;
     }
 }
 exports.CryptoTradingBot = CryptoTradingBot;

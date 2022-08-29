@@ -3,47 +3,62 @@ import { StoreDataJson } from './Main/StoreDataToJson';
 import {EMA} from './Main/EMA';
 import * as readline from 'readline';
 
-let rl = readline.createInterface({
-  input: process.stdin,
-  output: process.stdout
-});
+export function FtxGetHistoricMarketData(){
+    return new Promise<any>((resolve, reject) => {
 
-let pairing: string // 'SRM/USD'
-let windowResolution: string// = '14400'//4h
+        let botConfig = {
+            pairing: '',
+            windowResolution: '',
+            secretKeyPath: '',
+            data: null
+        }
 
-rl.question('Enter market: <COIN/PAIRING> ', (answer: string) => {
-    pairing = answer;
-    rl.question('Enter window resolution <14400> (4h)', (answer2) => {
-        windowResolution = answer2;
+        let rl = readline.createInterface({
+            input: process.stdin,
+            output: process.stdout
+        });
+          
+        let pairing: string // 'SRM/USD'
+        let windowResolution: string// = '14400'//4h
+          
+        rl.question('Updating historic market data... \nEnter market: <COIN/PAIRING> ', (answer: string) => {
+            botConfig.pairing = answer;
+              rl.question('Enter window resolution <14400> (4h)', (answer2) => {
+                botConfig.windowResolution = answer2;
+                rl.question('Enter secret key path', (answer3) => {
+                    botConfig.secretKeyPath = answer3
 
-        let pairing1: string = pairing.replace('/', '')
-        let emaPeriod = 70;
-        let ftxEndpoint: string = `https://ftx.com/api`;
-        let endPoint = `${ftxEndpoint}/markets/${pairing}/candles?resolution=${windowResolution}`
-
-        const marketData = new FtxGetHandler(pairing, endPoint);
-        //set to true to return the last data entry/ false to get all data
-        marketData.lastEntry = false
-        marketData.ftxGetMarket()
-        .then((ret)=>{
-            return calcEmaStoreData(ret, emaPeriod, pairing1);
-        })
-        .then(() => {
-            console.log("complete")
-        })
-        .catch(err=>{console.log(err)});
-
-
-        rl.close()
-
-    })
+                    let pairing1: string = pairing.replace('/', '')
+                    let emaPeriod = 70;
+                    let ftxEndpoint: string = `https://ftx.com/api`;
+                    let endPoint = `${ftxEndpoint}/markets/${pairing}/candles?resolution=${windowResolution}`
+              
+                    const marketData = new FtxGetHandler(pairing, endPoint);
+                    marketData.lastEntry = false
+                    marketData.ftxGetMarket()
+                    .then((ret)=>{
+                        return calcEmaStoreData(ret, emaPeriod, pairing1, windowResolution);
+                    })
+                    .then((md) => {
+                        console.log("complete ema")
+                        botConfig.data = md
+                        resolve(botConfig)
+                    })
+                    .catch(err=>{console.log(err); reject()});
     
-})
+                    rl.close()
+                })
+            })
+        })
+    })
+}
 
 
-function calcEmaStoreData(ret:any, emaPeriod: number, pairing1: string) {
 
-    return new Promise<void>((resolve, reject) => {
+
+function calcEmaStoreData(ret:any, emaPeriod: number, pairing1: string, windowResolution: string) {
+
+    return new Promise<any>((resolve, reject) => {
         let emaYesterday: any;
         let priceToday: any;
 
@@ -68,7 +83,7 @@ function calcEmaStoreData(ret:any, emaPeriod: number, pairing1: string) {
         //send store data to json (filename: coin + time)
         let newJson = new StoreDataJson('D:\\CryptoProject\\DataCollector\\MarketData\\',pairing1, windowResolution);
         newJson.storeToJson(addedEma).then(() => {
-            resolve();
+            resolve(addedEma);
         })
         .catch((err) => {
             reject(err);

@@ -23,39 +23,55 @@ var __importStar = (this && this.__importStar) || function (mod) {
     return result;
 };
 Object.defineProperty(exports, "__esModule", { value: true });
+exports.FtxGetHistoricMarketData = void 0;
 const FtxApiGetRequest_1 = require("./Main/FtxApiGetRequest");
 const StoreDataToJson_1 = require("./Main/StoreDataToJson");
 const EMA_1 = require("./Main/EMA");
 const readline = __importStar(require("readline"));
-let rl = readline.createInterface({
-    input: process.stdin,
-    output: process.stdout
-});
-let pairing; // 'SRM/USD'
-let windowResolution; // = '14400'//4h
-rl.question('Enter market: <COIN/PAIRING> ', (answer) => {
-    pairing = answer;
-    rl.question('Enter window resolution <14400> (4h)', (answer2) => {
-        windowResolution = answer2;
-        let pairing1 = pairing.replace('/', '');
-        let emaPeriod = 70;
-        let ftxEndpoint = `https://ftx.com/api`;
-        let endPoint = `${ftxEndpoint}/markets/${pairing}/candles?resolution=${windowResolution}`;
-        const marketData = new FtxApiGetRequest_1.FtxGetHandler(pairing, endPoint);
-        //set to true to return the last data entry/ false to get all data
-        marketData.lastEntry = false;
-        marketData.ftxGetMarket()
-            .then((ret) => {
-            return calcEmaStoreData(ret, emaPeriod, pairing1);
-        })
-            .then(() => {
-            console.log("complete");
-        })
-            .catch(err => { console.log(err); });
-        rl.close();
+function FtxGetHistoricMarketData() {
+    return new Promise((resolve, reject) => {
+        let botConfig = {
+            pairing: '',
+            windowResolution: '',
+            secretKeyPath: '',
+            data: null
+        };
+        let rl = readline.createInterface({
+            input: process.stdin,
+            output: process.stdout
+        });
+        let pairing; // 'SRM/USD'
+        let windowResolution; // = '14400'//4h
+        rl.question('Updating historic market data... \nEnter market: <COIN/PAIRING> ', (answer) => {
+            botConfig.pairing = answer;
+            rl.question('Enter window resolution <14400> (4h)', (answer2) => {
+                botConfig.windowResolution = answer2;
+                rl.question('Enter secret key path', (answer3) => {
+                    botConfig.secretKeyPath = answer3;
+                    let pairing1 = pairing.replace('/', '');
+                    let emaPeriod = 70;
+                    let ftxEndpoint = `https://ftx.com/api`;
+                    let endPoint = `${ftxEndpoint}/markets/${pairing}/candles?resolution=${windowResolution}`;
+                    const marketData = new FtxApiGetRequest_1.FtxGetHandler(pairing, endPoint);
+                    marketData.lastEntry = false;
+                    marketData.ftxGetMarket()
+                        .then((ret) => {
+                        return calcEmaStoreData(ret, emaPeriod, pairing1, windowResolution);
+                    })
+                        .then((md) => {
+                        console.log("complete ema");
+                        botConfig.data = md;
+                        resolve(botConfig);
+                    })
+                        .catch(err => { console.log(err); reject(); });
+                    rl.close();
+                });
+            });
+        });
     });
-});
-function calcEmaStoreData(ret, emaPeriod, pairing1) {
+}
+exports.FtxGetHistoricMarketData = FtxGetHistoricMarketData;
+function calcEmaStoreData(ret, emaPeriod, pairing1, windowResolution) {
     return new Promise((resolve, reject) => {
         let emaYesterday;
         let priceToday;
@@ -75,7 +91,7 @@ function calcEmaStoreData(ret, emaPeriod, pairing1) {
         //send store data to json (filename: coin + time)
         let newJson = new StoreDataToJson_1.StoreDataJson('D:\\CryptoProject\\DataCollector\\MarketData\\', pairing1, windowResolution);
         newJson.storeToJson(addedEma).then(() => {
-            resolve();
+            resolve(addedEma);
         })
             .catch((err) => {
             reject(err);
