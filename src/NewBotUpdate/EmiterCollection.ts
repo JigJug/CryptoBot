@@ -1,5 +1,6 @@
 import { FtxClient } from './FtxClient';
 import { EventEmitter } from 'events';
+import {MarketDataObject} from './typings'
 
 
 export class EmiterCollection extends EventEmitter {
@@ -36,22 +37,23 @@ export class EmiterCollection extends EventEmitter {
 
 
     
-    sendFourHourData(lastTime: number){
+    sendFourHourData(lastTime: number, windowResolution: number){
 
         let cli = this.exchangeClient;
 
-        let fourHour: number = 1000 * 60 * 60 * 4;
+        let fourHour: number = 1000 * windowResolution;
         let timeMills: number
         let timeDiff: number
 
         setInterval(() => {
             timeMills = new Date().getTime();
             timeDiff = timeMills - lastTime
+            console.log('timediff = ' + timeDiff)
             if(timeDiff > fourHour){
-                lastTime =+ fourHour
+                lastTime = lastTime + fourHour
 
                 cli.ftxGetMarket(true, cli.marketDataEndPoint)
-                .then((md) => {
+                .then((md: any) => {
                     this.emit('FourHourData', md)
                 })
                 .catch((err) => {
@@ -59,8 +61,9 @@ export class EmiterCollection extends EventEmitter {
                 });
 
             }
+            this.emit('BotStatusUpdate', timeMills, timeDiff)
 
-        },60000)
+        },6000)
     }
 
 

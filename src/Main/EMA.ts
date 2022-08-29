@@ -3,7 +3,7 @@ Calculates the ema for a given closing price at the end of the time interval
 To find the first ema entry When calculating a data set, the SMA will need to be run first
 The SMA value will give the first value of EMA yesterday.
 */
-
+import { MarketDataObject } from "../NewBotUpdate/typings"
 export class EMA{
 
     period: number
@@ -12,11 +12,8 @@ export class EMA{
 
     constructor(
         period: number,
-        data: any
     ){
         this.period = period
-        this.data = data
-        this.sma = this.smaCalc()
     }
 
     //methods
@@ -33,15 +30,11 @@ export class EMA{
     //only use this if you need to calc full ema. runs once to get the sma
     //need sma to use as the first value of ema yesterday, then from there
     //can calc the ema
-    smaCalc(){
+    smaCalc(data: [MarketDataObject]){
         let totalPrice = 0;
 
-        //this.data.map((value: any) => {
-        //    totalPrice += value.close
-        //})
-
         for(let i = 0; i < this.period; i++){
-            totalPrice = totalPrice + this.data[i].close; 
+            totalPrice = totalPrice + data[i].close; 
         }
         
         return totalPrice / this.period

@@ -18,9 +18,6 @@ export function FtxGetHistoricMarketData(){
             output: process.stdout
         });
           
-        let pairing: string // 'SRM/USD'
-        let windowResolution: string// = '14400'//4h
-          
         rl.question('Updating historic market data... \nEnter market: <COIN/PAIRING> ', (answer: string) => {
             botConfig.pairing = answer;
               rl.question('Enter window resolution <14400> (4h)', (answer2) => {
@@ -28,23 +25,23 @@ export function FtxGetHistoricMarketData(){
                 rl.question('Enter secret key path', (answer3) => {
                     botConfig.secretKeyPath = answer3
 
-                    let pairing1: string = pairing.replace('/', '')
+                    let pairing1: string = botConfig.pairing.replace('/', '')
                     let emaPeriod = 70;
                     let ftxEndpoint: string = `https://ftx.com/api`;
-                    let endPoint = `${ftxEndpoint}/markets/${pairing}/candles?resolution=${windowResolution}`
+                    let endPoint = `${ftxEndpoint}/markets/${botConfig.pairing}/candles?resolution=${botConfig.windowResolution}`
               
-                    const marketData = new FtxGetHandler(pairing, endPoint);
+                    const marketData = new FtxGetHandler(botConfig.pairing, endPoint);
                     marketData.lastEntry = false
                     marketData.ftxGetMarket()
                     .then((ret)=>{
-                        return calcEmaStoreData(ret, emaPeriod, pairing1, windowResolution);
+                        return calcEmaStoreData(ret, emaPeriod, pairing1, botConfig.windowResolution);
                     })
                     .then((md) => {
                         console.log("complete ema")
                         botConfig.data = md
                         resolve(botConfig)
                     })
-                    .catch(err=>{console.log(err); reject()});
+                    .catch(err=>{console.log('HISTORY ERROR: '+err); reject(err)});
     
                     rl.close()
                 })
@@ -62,11 +59,9 @@ function calcEmaStoreData(ret:any, emaPeriod: number, pairing1: string, windowRe
         let emaYesterday: any;
         let priceToday: any;
 
-        const getEMA = new EMA(emaPeriod, ret.result);
+        const getEMA = new EMA(emaPeriod);
 
-        emaYesterday = getEMA.smaCalc();
-        console.log(emaYesterday)
-
+        emaYesterday = getEMA.smaCalc(ret.result);
         ret.result[emaPeriod].ema = emaYesterday;
     
         const calcEma = (currentValue: any, index: any) => {
@@ -86,7 +81,7 @@ function calcEmaStoreData(ret:any, emaPeriod: number, pairing1: string, windowRe
             resolve(addedEma);
         })
         .catch((err) => {
-            reject(err);
+            reject('EMA calc ERROR: '+err);
         })
     })
 }

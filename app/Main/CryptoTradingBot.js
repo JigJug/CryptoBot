@@ -60,7 +60,7 @@ class CryptoTradingBot {
     setFourHourData() {
         const newMdSet = new FtxApiGetRequest_1.FtxGetHandler(this.pairing, this.marketDataEndpoint);
         newMdSet.lastEntry = true;
-        const newEma = new EMA_1.EMA(70, this.marketData);
+        const newEma = new EMA_1.EMA(70);
         //let timeMills = time.getTime();
         let fourHour = 1000 * 60 * 60 * 4;
         setInterval(() => {

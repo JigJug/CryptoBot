@@ -21,8 +21,6 @@ export class HttpsGetRequest {
 
                 res.on('data', (d: any) => {
                     clearTimeout(timer);
-                    console.log('new data ')
-                    console.log(d + '\n')
                     opStr = opStr + d.toString()
                     timer = setTimeout(()=>{resolve(opStr);}, 2000);
                 });

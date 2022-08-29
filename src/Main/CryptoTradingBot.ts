@@ -88,7 +88,7 @@ export class CryptoTradingBot {
     setFourHourData(){
         const newMdSet = new FtxGetHandler(this.pairing, this.marketDataEndpoint);
         newMdSet.lastEntry = true
-        const newEma = new EMA(70, this.marketData);
+        const newEma = new EMA(70);
 
         
         //let timeMills = time.getTime();

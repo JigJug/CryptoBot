@@ -1,24 +1,23 @@
 import { FtxGetHistoricMarketData } from "../FtxGetHistoricMarketData";
 import { CryptoTradingBot } from "../NewBotUpdate/CryptoTradingBotTestUpdateEvents";
-
+let x = ''
 FtxGetHistoricMarketData()
 .then((rt) => {
 
     let marketData = rt.data[rt.data.length - 1]
-    const NewBot = new CryptoTradingBot(rt.pairing, rt.windowResolution, marketData, rt.secretKeyPath, 0, 0.6672)
-
+    console.log(rt.pairing)
+    console.log(rt.windowResolution)
+    console.log(rt.secretKeyPath)
+    console.log(marketData)
+    console.log('start new bot instance')
+    console.log(marketData.close)
+    const NewBot = new CryptoTradingBot(rt.pairing, rt.windowResolution, marketData, rt.secretKeyPath, 0, 0.6749)
+    console.log('startbotscript starting bot')
     NewBot.startBot();
 
-    console.log(NewBot.ammountCoin)
-    console.log(NewBot.ammountUsdc)
-    console.log(NewBot.bought)
-    console.log(NewBot.buySellTrigger)
-    console.log(NewBot.pairing)
-    console.log(NewBot.price)
-    console.log(NewBot.secretkeyPath)
-    console.log(NewBot.sold)
+
 })
-.catch(()=> {console.log('ERROR: Could not start bot')});
+.catch((err)=> {console.log('ERROR: Could not start bot' + err)});
 
 
 

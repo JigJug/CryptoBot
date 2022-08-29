@@ -15,8 +15,6 @@ class HttpsGetRequest {
             https.get(endPoint, (res) => {
                 res.on('data', (d) => {
                     clearTimeout(timer);
-                    console.log('new data ');
-                    console.log(d + '\n');
                     opStr = opStr + d.toString();
                     timer = setTimeout(() => { resolve(opStr); }, 2000);
                 });

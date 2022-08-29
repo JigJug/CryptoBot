@@ -22,16 +22,17 @@ class EmiterCollection extends events_1.EventEmitter {
             });
         }, 5000);
     }
-    sendFourHourData(lastTime) {
+    sendFourHourData(lastTime, windowResolution) {
         let cli = this.exchangeClient;
-        let fourHour = 1000 * 60 * 60 * 4;
+        let fourHour = 1000 * windowResolution;
         let timeMills;
         let timeDiff;
         setInterval(() => {
             timeMills = new Date().getTime();
             timeDiff = timeMills - lastTime;
+            console.log('timediff = ' + timeDiff);
             if (timeDiff > fourHour) {
-                lastTime = +fourHour;
+                lastTime = lastTime + fourHour;
                 cli.ftxGetMarket(true, cli.marketDataEndPoint)
                     .then((md) => {
                     this.emit('FourHourData', md);
@@ -40,7 +41,8 @@ class EmiterCollection extends events_1.EventEmitter {
                     console.log(err);
                 });
             }
-        }, 60000);
+            this.emit('BotStatusUpdate', timeMills, timeDiff);
+        }, 6000);
     }
 }
 exports.EmiterCollection = EmiterCollection;
