@@ -60,6 +60,7 @@ export class EmiterCollection extends EventEmitter {
                     console.log(err)
                 });
 
+                
             }
             this.emit('BotStatusUpdate', timeMills, timeDiff)
 

@@ -41,6 +41,7 @@ export class FtxClient {
             this.getReq(endPoint)
             .then((returnD) => {
 
+                
                 let returnDjson = JSON.parse(returnD);
 
                 if(returnDjson.success == true){

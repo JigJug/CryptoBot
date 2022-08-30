@@ -181,6 +181,7 @@ export class CryptoTradingBot {
         }, 120000)
     }
 
+    
     updateMarketData(md: MarketDataObject){
         console.log('updating market data' )
         this.marketData.startTime = md.startTime

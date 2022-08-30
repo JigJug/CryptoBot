@@ -127,6 +127,8 @@ class CryptoTradingBot {
             console.log('volume: ' + this.marketData.volume);
             console.log('bought: ' + this.bought);
             console.log('sold: ' + this.sold + '\n');
+            console.log('ammount usd = ' + this.ammountUsdc);
+            console.log('ammount coin = ' + this.ammountCoin);
         }, 120000);
     }
     updateMarketData(md) {

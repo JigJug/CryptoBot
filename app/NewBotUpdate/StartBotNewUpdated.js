@@ -2,7 +2,7 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 const FtxGetHistoricMarketData_1 = require("../FtxGetHistoricMarketData");
 const CryptoTradingBotTestUpdateEvents_1 = require("../NewBotUpdate/CryptoTradingBotTestUpdateEvents");
-let x = 'D:\\CryptoProject\\et\\et.json';
+let x = '';
 (0, FtxGetHistoricMarketData_1.FtxGetHistoricMarketData)()
     .then((rt) => {
     let marketData = rt.data[rt.data.length - 1];
