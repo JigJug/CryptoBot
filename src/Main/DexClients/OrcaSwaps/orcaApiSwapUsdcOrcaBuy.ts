@@ -3,9 +3,7 @@ import { Connection, Keypair } from "@solana/web3.js";
 import { getOrca, OrcaPoolConfig } from "@orca-so/sdk";
 import Decimal from "decimal.js";
 
-
-
-export function orcaApiSwapSell(path:string, ammount: number){
+export function orcaApiSwapBuy(path:string, ammount: number){
     return new Promise<void>((resolve, reject) => {
 
         const main = async () => {
@@ -31,32 +29,26 @@ export function orcaApiSwapSell(path:string, ammount: number){
                 /*** Swap ***/
                 // 3. We will be swapping 0.1 SOL for some ORCA
                 const orcaUsdcPool = orca.getPool(OrcaPoolConfig.ORCA_USDC); // get the liquidity pool
-                const orcaToken = orcaUsdcPool.getTokenA(); //or getTokenB(); // get the token a or b from pool name
-                const orcaAmount = new Decimal(ammount);
+                const usdcToken = orcaUsdcPool.getTokenB(); //or getTokenA(); // get the token a or b from pool name
+                const usdcAmount = new Decimal(ammount);
                 const slippage = new Decimal(0.05)
-                const quote = await orcaUsdcPool.getQuote(orcaToken, orcaAmount, slippage);
-                const usdcAmount = quote.getMinOutputAmount();
+                const quote = await orcaUsdcPool.getQuote(usdcToken, usdcAmount, slippage);
+                const orcaAmount = quote.getMinOutputAmount();
           
-                console.log(`Swap ${orcaAmount.toString()} orca for at least ${usdcAmount.toNumber()} usdc`);
-                const swapPayload = await orcaUsdcPool.swap(owner, orcaToken, orcaAmount, usdcAmount);
+                console.log(`Swap ${usdcAmount.toString()} usdc for at least ${orcaAmount.toNumber()} orca`);
+                const swapPayload = await orcaUsdcPool.swap(owner, usdcToken, usdcAmount, orcaAmount);
                 const swapTxId = await swapPayload.execute();
                 console.log("Swapped:", swapTxId, "\n");
-          
+                resolve();
           
             } catch (err) {
                 console.warn(err);
+                reject(err);
             }
         };
           
-        main()
-        .then(() => {
-            console.log("Done");
-            resolve()
-        })
-        .catch((e) => {
-            console.error(e);
-            reject()
-        });
+        main();
+
 
     })
 }

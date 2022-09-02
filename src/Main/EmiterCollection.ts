@@ -48,7 +48,6 @@ export class EmiterCollection extends EventEmitter {
         setInterval(() => {
             timeMills = new Date().getTime();
             timeDiff = timeMills - lastTime
-            console.log('timediff = ' + timeDiff)
             if(timeDiff > fourHour){
                 lastTime = lastTime + fourHour
 

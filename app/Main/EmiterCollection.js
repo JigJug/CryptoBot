@@ -30,7 +30,6 @@ class EmiterCollection extends events_1.EventEmitter {
         setInterval(() => {
             timeMills = new Date().getTime();
             timeDiff = timeMills - lastTime;
-            console.log('timediff = ' + timeDiff);
             if (timeDiff > fourHour) {
                 lastTime = lastTime + fourHour;
                 cli.ftxGetMarket(true, cli.marketDataEndPoint)

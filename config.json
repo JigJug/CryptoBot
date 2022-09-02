@@ -1,0 +1,8 @@
+{
+    "pairing": "ORCA/USD",
+    "windowResolution": "300",
+    "secretKeyPath": "D:\\CryptoProject\\et\\et.json",
+    "emaInterval": "70",
+    "cexData": "FTX",
+    "data": null
+}

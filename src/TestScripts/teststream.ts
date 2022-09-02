@@ -1,4 +1,4 @@
-import { EmiterCollection } from "../NewBotUpdate/EmiterCollection";
+import { EmiterCollection } from "../Main/EmiterCollection";
 
 const rec = new EmiterCollection('RAY/USD', '14400')
 

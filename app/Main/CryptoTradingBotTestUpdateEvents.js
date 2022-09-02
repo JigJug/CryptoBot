@@ -1,22 +1,23 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.CryptoTradingBot = void 0;
-const EMA_1 = require("../Main/EMA");
-const orcaApiSwapRayUsdcSell_1 = require("../OrcaSwaps/orcaApiSwapRayUsdcSell");
-const orcaApiSwapUsdcRayBuy_1 = require("../OrcaSwaps/orcaApiSwapUsdcRayBuy");
+const EMA_1 = require("./EMA");
+const orcaApiSwapOrcaUsdcSell_1 = require("./DexClients/OrcaSwaps/orcaApiSwapOrcaUsdcSell");
+const orcaApiSwapUsdcOrcaBuy_1 = require("./DexClients/OrcaSwaps/orcaApiSwapUsdcOrcaBuy");
+const CheckWalletBalances_1 = require("./CheckWalletBalances");
 const EmiterCollection_1 = require("./EmiterCollection");
 class CryptoTradingBot {
-    constructor(pairing, windowResolution, marketData, secretkeyPath, ammountUsdc, price) {
+    constructor(pairing, windowResolution, marketData, secretkeyPath, price) {
         this.pairing = pairing;
         this.windowResolution = windowResolution;
         this.marketData = marketData;
         this.secretkeyPath = secretkeyPath;
-        this.ammountUsdc = ammountUsdc;
         this.price = price;
         this.buySellTrigger = true;
-        this.bought = true;
-        this.sold = false;
-        this.ammountCoin = 13;
+        this.bought = false;
+        this.sold = true;
+        this.ammountUsdc = 0;
+        this.ammountCoin = 0;
         this.dataEmiters = new EmiterCollection_1.EmiterCollection(this.pairing, this.windowResolution);
         this.ema = new EMA_1.EMA(70);
         this.timeMills = 0;
@@ -81,15 +82,19 @@ class CryptoTradingBot {
     }
     buy() {
         this.buySellTrigger = false;
-        (0, orcaApiSwapUsdcRayBuy_1.orcaApiSwapBuy)(this.secretkeyPath, this.ammountUsdc)
-            .then((ammount) => {
-            this.ammountCoin = ammount;
+        (0, CheckWalletBalances_1.getBalance)(true)
+            .then((bal) => {
+            this.ammountUsdc = bal;
+            return (0, orcaApiSwapUsdcOrcaBuy_1.orcaApiSwapBuy)(this.secretkeyPath, bal);
+        })
+            .then(() => {
             this.buySellTrigger = true;
             this.bought = true;
             this.sold = false;
         })
             .catch((err) => {
             console.log(err);
+            //this.buy();
         });
     }
     getSell() {
@@ -97,15 +102,19 @@ class CryptoTradingBot {
     }
     sell() {
         this.buySellTrigger = false;
-        (0, orcaApiSwapRayUsdcSell_1.orcaApiSwapSell)(this.secretkeyPath, this.ammountCoin)
-            .then((ammount) => {
-            this.ammountUsdc = ammount;
+        (0, CheckWalletBalances_1.getBalance)(false)
+            .then((bal) => {
+            this.ammountCoin = bal;
+            return (0, orcaApiSwapOrcaUsdcSell_1.orcaApiSwapSell)(this.secretkeyPath, bal);
+        })
+            .then(() => {
             this.buySellTrigger = true;
             this.sold = true;
             this.bought = false;
         })
             .catch((err) => {
             console.log(err);
+            //this.sell();
         });
     }
     calcEma(close, emaYesterday) {

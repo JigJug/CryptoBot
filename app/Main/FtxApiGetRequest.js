@@ -1,7 +1,7 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.FtxGetHandler = void 0;
-const NewGetRequest_1 = require("./NewGetRequest");
+const NewUpdateGetRequest_1 = require("./NewUpdateGetRequest");
 class FtxGetHandler {
     constructor(marketName, endPoint) {
         this.marketName = marketName;
@@ -11,8 +11,8 @@ class FtxGetHandler {
     //methods
     ftxGetMarket() {
         return new Promise((resolve, reject) => {
-            const getReq = new NewGetRequest_1.HttpsGetRequest(this.endPoint);
-            getReq.httpsGet()
+            const getReq = new NewUpdateGetRequest_1.HttpsGetRequest();
+            getReq.httpsGet(this.endPoint)
                 .then((returnD) => {
                 let returnDjson = JSON.parse(returnD);
                 if (returnDjson.success == true) {

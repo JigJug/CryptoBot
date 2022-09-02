@@ -1,4 +1,4 @@
-import { HttpsGetRequest } from "./NewGetRequest";
+import { HttpsGetRequest } from "./NewUpdateGetRequest";
 
 //ftx get response type
 type FtxApiObject = {
@@ -8,11 +8,11 @@ type FtxApiObject = {
 
 export class FtxGetHandler {
 
-    marketName: string | null
-    endPoint: string | null
-    lastEntry: boolean | null
+    marketName: string
+    endPoint: string
+    lastEntry: boolean
 
-    constructor(marketName: string | null, endPoint: string | null){
+    constructor(marketName: string, endPoint: string){
         this.marketName = marketName
         this.endPoint = endPoint
         this.lastEntry = false
@@ -23,9 +23,9 @@ export class FtxGetHandler {
 
         return new Promise<any>((resolve, reject)=>{
 
-            const getReq = new HttpsGetRequest(this.endPoint);
+            const getReq = new HttpsGetRequest();
     
-            getReq.httpsGet()
+            getReq.httpsGet(this.endPoint)
             .then((returnD) => {
 
                 let returnDjson = JSON.parse(returnD);

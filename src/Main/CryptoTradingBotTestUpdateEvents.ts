@@ -1,6 +1,7 @@
-import { EMA } from '../Main/EMA'
-import { orcaApiSwapSell } from '../OrcaSwaps/orcaApiSwapRayUsdcSell'
-import { orcaApiSwapBuy } from '../OrcaSwaps/orcaApiSwapUsdcRayBuy'
+import { EMA } from './EMA'
+import { orcaApiSwapSell } from './DexClients/OrcaSwaps/orcaApiSwapOrcaUsdcSell'
+import { orcaApiSwapBuy } from './DexClients/OrcaSwaps/orcaApiSwapUsdcOrcaBuy'
+import { getBalance } from './CheckWalletBalances'
 import { EmiterCollection } from './EmiterCollection'
 import { MarketDataObject } from './typings'
 
@@ -10,12 +11,12 @@ export class CryptoTradingBot {
     windowResolution
     marketData
     secretkeyPath
-    ammountUsdc
     price
 
     buySellTrigger
     bought
     sold
+    ammountUsdc
     ammountCoin
     dataEmiters
     ema
@@ -27,20 +28,19 @@ export class CryptoTradingBot {
         windowResolution: string,
         marketData: MarketDataObject,
         secretkeyPath: string,
-        ammountUsdc: number,
         price: number,
     ){
         this.pairing = pairing
         this.windowResolution = windowResolution
         this.marketData = marketData
         this.secretkeyPath = secretkeyPath
-        this.ammountUsdc = ammountUsdc
         this.price = price
         
         this.buySellTrigger = true
-        this.bought = true
-        this.sold = false
-        this.ammountCoin = 13
+        this.bought = false
+        this.sold = true
+        this.ammountUsdc = 0
+        this.ammountCoin = 0
         this.dataEmiters = new EmiterCollection(this.pairing, this.windowResolution)
         this.ema = new EMA(70)
         this.timeMills = 0
@@ -121,15 +121,19 @@ export class CryptoTradingBot {
     
     buy(){
         this.buySellTrigger = false
-        orcaApiSwapBuy(this.secretkeyPath, this.ammountUsdc)
-        .then((ammount: number)=>{
-            this.ammountCoin = ammount
+        getBalance(true)
+        .then((bal) =>{
+            this.ammountUsdc = bal;
+            return orcaApiSwapBuy(this.secretkeyPath, bal)
+        })
+        .then(()=>{
             this.buySellTrigger = true
             this.bought = true 
             this.sold = false        
         })
         .catch((err: Error) => {
             console.log(err);
+            //this.buy();
         });
     }
             
@@ -141,15 +145,19 @@ export class CryptoTradingBot {
 
     sell(){
         this.buySellTrigger = false
-        orcaApiSwapSell(this.secretkeyPath, this.ammountCoin)
-        .then((ammount: number)=>{
-            this.ammountUsdc = ammount
+        getBalance(false)
+        .then((bal) => {
+            this.ammountCoin = bal;
+            return orcaApiSwapSell(this.secretkeyPath, bal)
+        })
+        .then(()=>{
             this.buySellTrigger = true
             this.sold = true
             this.bought = false
         })
         .catch((err: Error) => {
             console.log(err);
+            //this.sell();
         });
     }
 

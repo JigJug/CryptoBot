@@ -48,20 +48,14 @@ function orcaApiSwapSell(path, ammount) {
                 const swapPayload = yield orcaUsdcPool.swap(owner, orcaToken, orcaAmount, usdcAmount);
                 const swapTxId = yield swapPayload.execute();
                 console.log("Swapped:", swapTxId, "\n");
+                resolve();
             }
             catch (err) {
                 console.warn(err);
+                reject(err);
             }
         });
-        main()
-            .then(() => {
-            console.log("Done");
-            resolve();
-        })
-            .catch((e) => {
-            console.error(e);
-            reject();
-        });
+        main();
     });
 }
 exports.orcaApiSwapSell = orcaApiSwapSell;
