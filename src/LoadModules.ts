@@ -22,15 +22,20 @@ export class LoadBot{
         .then((rt) => {
             if(rt.data != null){
                 let marketData = rt.data[rt.data.length - 1]
-                console.log(rt.pairing)
-                console.log(rt.windowResolution)
-                console.log(rt.secretKeyPath)
-                console.log(marketData)
+                console.log(rt.pairing, rt.windowResolution, marketData)
                 console.log('start new bot instance')
-                console.log(marketData.close)
-                const NewBot = new CryptoTradingBot(rt.pairing, rt.windowResolution, marketData, rt.secretKeyPath, 0.8954, rt.dex)
-                console.log('startbotscript starting bot')
+
+                const NewBot = new CryptoTradingBot(
+                    rt.pairing,
+                    rt.windowResolution,
+                    marketData,
+                    rt.secretKeyPath,
+                    marketData.close,
+                    rt.dex
+                )
+                
                 NewBot.startBot();
+                console.log('startbotscript starting bot')
             }
             
 
