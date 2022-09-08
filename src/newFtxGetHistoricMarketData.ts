@@ -1,4 +1,4 @@
-import { FtxGetHandler } from './Main/FtxApiGetRequest'
+import { FtxClient } from './Main/FtxClient'
 import { StoreDataJson } from './Main/StoreDataToJson';
 import {EMA} from './Main/EMA';
 import { BotConfig} from './Main/typings';
@@ -11,9 +11,8 @@ export function FtxGetHistoricMarketData(botConfig: BotConfig){
         let ftxEndpoint: string = `https://ftx.com/api`;
         let endPoint = `${ftxEndpoint}/markets/${botConfig.pairing}/candles?resolution=${botConfig.windowResolution}`
               
-        const marketData = new FtxGetHandler(botConfig.pairing, endPoint);
-        marketData.lastEntry = false
-        marketData.ftxGetMarket()
+        const marketData = new FtxClient(botConfig.pairing, botConfig.windowResolution);
+        marketData.ftxGetMarket(false, marketData.marketDataEndPoint)
         .then((ret)=>{
             return calcEmaStoreData(ret, emaPeriod, pairing1, botConfig.windowResolution);
         })

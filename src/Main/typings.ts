@@ -1,6 +1,7 @@
 export interface FtxApiObject {//ftx get response type
     success: Boolean;
-    result: [];
+    result: MarketDataObject[] | MarketDataObject | SingleMarketObject
+    error: string
 }
 
 export interface MarketDataObject {
@@ -20,9 +21,41 @@ export interface BotConfig {
     secretKeyPath: string;
     emaInterval: string;
     cexData: string;
+    dex: string;
     data: null | MarketDataObject[]
 }
 
 export interface HistoricData {
 
+}
+
+export interface SecretKeyObj {
+    sp: string;
+    pk: number[]
+}
+
+export interface SingleMarketObject{
+    name: string;
+    baseCurrency: null;
+    quoteCurrency: null;
+    quoteVolume24h: number;
+    change1h: number;
+    change24h: number;
+    changeBod: number;
+    highLeverageFeeExempt: boolean;
+    minProvideSize: number;
+    type: string;
+    underlying: string;
+    enabled: boolean;
+    ask: number;
+    bid: number;
+    last: number;
+    postOnly: boolean;
+    price: number;
+    priceIncrement: number;
+    sizeIncrement: number;
+    restricted: boolean;
+    volumeUsd24h: number;
+    largeOrderThreshold: number;
+    isEtfMarket: boolean;
 }

@@ -1,9 +1,9 @@
 import { EMA } from './EMA'
-import { orcaApiSwapSell } from './DexClients/OrcaSwaps/orcaApiSwapOrcaUsdcSell'
-import { orcaApiSwapBuy } from './DexClients/OrcaSwaps/orcaApiSwapUsdcOrcaBuy'
+import { LoadExchange } from './DexClients/ExchangeLoader'
 import { getBalance } from './CheckWalletBalances'
 import { EmiterCollection } from './EmiterCollection'
-import { MarketDataObject } from './typings'
+import { MarketDataObject, SecretKeyObj } from './typings'
+const fs = require('fs');
 
 
 export class CryptoTradingBot {
@@ -12,16 +12,17 @@ export class CryptoTradingBot {
     marketData
     secretkeyPath
     price
+    dex
 
     buySellTrigger
     bought
     sold
-    ammountUsdc
-    ammountCoin
+    coin
     dataEmiters
     ema
-    timeMills
-    timeDiff
+    dexClient
+    secretKey
+    
     
     constructor(
         pairing: string,
@@ -29,22 +30,23 @@ export class CryptoTradingBot {
         marketData: MarketDataObject,
         secretkeyPath: string,
         price: number,
+        dex: string
     ){
         this.pairing = pairing
         this.windowResolution = windowResolution
         this.marketData = marketData
         this.secretkeyPath = secretkeyPath
         this.price = price
+        this.dex = dex
         
         this.buySellTrigger = true
         this.bought = false
         this.sold = true
-        this.ammountUsdc = 0
-        this.ammountCoin = 0
+        this.coin = 'RAY'
         this.dataEmiters = new EmiterCollection(this.pairing, this.windowResolution)
         this.ema = new EMA(70)
-        this.timeMills = 0
-        this.timeDiff = 0
+        this.dexClient = new LoadExchange(this.dex).swapClient();
+        this.secretKey = this.getSecretKey();
     }
 
     startBot(){
@@ -116,15 +118,14 @@ export class CryptoTradingBot {
 
 
     getBuy(){
-        return this.buy();
+        return this.buy('buy');
     }
     
-    buy(){
+    buy(side: string){
         this.buySellTrigger = false
-        getBalance(true)
+        getBalance('USD')
         .then((bal) =>{
-            this.ammountUsdc = bal;
-            return orcaApiSwapBuy(this.secretkeyPath, bal)
+            return this.dexClient(bal, side, this.secretKey)
         })
         .then(()=>{
             this.buySellTrigger = true
@@ -133,22 +134,21 @@ export class CryptoTradingBot {
         })
         .catch((err: Error) => {
             console.log(err);
-            //this.buy();
+            this.buySellTrigger = true
         });
     }
             
 
 
     getSell(){
-        return this.sell();
+        return this.sell('sell');
     }
 
-    sell(){
+    sell(side: string){
         this.buySellTrigger = false
-        getBalance(false)
+        getBalance(this.coin)
         .then((bal) => {
-            this.ammountCoin = bal;
-            return orcaApiSwapSell(this.secretkeyPath, bal)
+            return this.dexClient(bal, side, this.secretKey)
         })
         .then(()=>{
             this.buySellTrigger = true
@@ -157,7 +157,7 @@ export class CryptoTradingBot {
         })
         .catch((err: Error) => {
             console.log(err);
-            //this.sell();
+            this.buySellTrigger = true
         });
     }
 
@@ -170,22 +170,15 @@ export class CryptoTradingBot {
     }
 
     botStatusUpdate(){
-        this.dataEmiters.on('BotStatusUpdate', (timeMills, timeDiff) => {
-            this.timeMills = timeMills;
-            this.timeDiff = timeDiff;
-        })
         setInterval(()=>{
-            
-            console.log('timenow: ' + this.timeMills);
-            console.log('lastdatatime: ' + this.marketData.time);
-            console.log('timediff: ' + this.timeDiff);
-            console.log('price: ' + this.price);
-            console.log('ema: ' + this.marketData.ema);
-            console.log('volume: ' + this.marketData.volume);
-            console.log('bought: ' + this.bought);
-            console.log('sold: ' + this.sold + '\n');
-            console.log('ammount usd = '+ this.ammountUsdc);
-            console.log('ammount coin = ' + this.ammountCoin);
+            console.log(
+                `lastdatatime: ${this.marketData.startTime}\n
+                price: ${this.price}\n
+                ema: ${this.marketData.ema}\n
+                volume: ${this.marketData.volume}\n
+                bought: ${this.bought}\n
+                sold: ${this.sold}\n`
+            );
         }, 120000)
     }
 
@@ -200,7 +193,24 @@ export class CryptoTradingBot {
         this.marketData.close = md.close
         this.marketData.volume = md.volume
         this.marketData.ema = md.ema
-        console.log('updating market data : EMA = ' + this.marketData.ema)
-        
     }
+
+    getSecretKey():number[]{
+        return this.setSecretKey();
+    }
+
+    setSecretKey():number[]{
+        let secretKeyString = fs.readFileSync(this.secretkeyPath, "utf8", (err: Error, data: any)=>{
+            if(err){
+                console.log(err)
+                return
+            }
+        });
+        const secretKey: SecretKeyObj = JSON.parse(secretKeyString);
+        return secretKey.pk
+    }
+
+    //getCoin(): string{
+
+    //}
 }

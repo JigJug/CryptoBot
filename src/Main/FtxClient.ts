@@ -1,10 +1,5 @@
 import { HttpsGetRequest } from "./NewUpdateGetRequest";
-
-//ftx get response type
-type FtxApiObject = {
-    success: Boolean;
-    result: [];
-}
+import { FtxApiObject } from "./typings";
 
 export class FtxClient {
 
@@ -17,7 +12,6 @@ export class FtxClient {
     marketDataEndPoint
 
     
-
     constructor(marketName: String, windowResolution: string){
         this.marketName = marketName
         this.windowResolution = windowResolution
@@ -41,7 +35,6 @@ export class FtxClient {
             this.getReq(endPoint)
             .then((returnD) => {
 
-                
                 let returnDjson = JSON.parse(returnD);
 
                 if(returnDjson.success == true){

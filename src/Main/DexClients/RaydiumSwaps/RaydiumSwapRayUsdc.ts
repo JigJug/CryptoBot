@@ -1,65 +1,119 @@
-import { Connection, Keypair, PublicKey,} from "@solana/web3.js";
-import {fetchAllPoolKeys, fetchPoolKeys, getRouteRelated} from "./util_mainnet"
-import { getTokenAccountsByOwner, swap, addLiquidity, removeLiquidity, routeSwap, tradeSwap, getLiquidityInfo } from "./util";
+import { Connection, Keypair, PublicKey } from "@solana/web3.js";
+import { Liquidity, Token, TokenAmount, Percent } from "@raydium-io/raydium-sdk";
+
+import { fetchAllPoolKeys, fetchPoolKeys } from "./util_mainnet";
+import { getTokenAccountsByOwner} from "./util";
+const fs = require('fs');
 
 // @ts-ignore
-import bs58 from "bs58"
-import { SERUM_PROGRAM_ID_V3 } from "@raydium-io/raydium-sdk";
+import bs58 from "bs58";
 
+export function raydiumApiSwap(ammount: number, side: string, secretKey: number[]){
+    return new Promise<void>((resolve, reject) => {
 
-(async () => {
-    const connection = new Connection("https://solana-api.projectserum.com", "confirmed");
+        const main = async () => {
 
-    // change to your privateKey
-    const secretKey = bs58.decode('3qswEeCJcA9ogpN3JEuXBtmnU35YPzSxBwzrk6sdTPhogMJ64WuabU9XWg2yUegJvv1qupYPqo2jQrrK26N7HGsD')
+            const connection = new Connection("https://solana-api.projectserum.com", "confirmed");
 
-    const ownerKeypair = Keypair.fromSecretKey( secretKey )
-    const owner = ownerKeypair.publicKey;
-    console.log(owner.toString());
-    
-    const tokenAccounts = await getTokenAccountsByOwner(connection, owner)
+            
+            const skBuffer = Buffer.from(secretKey)//secretKey.pk);
+            const ownerKeypair = Keypair.fromSecretKey(skBuffer);
+            const owner = ownerKeypair.publicKey;
+            console.log(owner.toString());
+            
+            try {
+                const tokenAccounts = await getTokenAccountsByOwner(connection, owner);
+                const RAY_USDC = "6UmmUiYoBjSrhakAobJw8BvkmJtDVxaeBtbt7rxWo1mg";
+                //const SOL_USDC = '58oQChx4yWmvKdwLLZzBi4ChoCc2fqCUWBkwMihLYQo2'
+                console.log('connected token account')
+                const poolKeys = await fetchPoolKeys(connection, new PublicKey(RAY_USDC));
+                console.log('fetched pool keys')
+                if (poolKeys) {
+                    const poolInfo = await Liquidity.fetchInfo({ connection, poolKeys });
+                    ammount = ammount * 1000000
+                    let coinIn: PublicKey
+                    let coinOut: PublicKey
+                    if(side == 'buy'){
+                        coinIn = poolKeys.quoteMint;
+                        coinOut = poolKeys.baseMint;
+                    }
+                    else{
+                        coinIn = poolKeys.baseMint;
+                        coinOut = poolKeys.quoteMint;
+                    }
+                    const amountIn = new TokenAmount(new Token(coinIn, 6), ammount);
+                    const currencyOut = new Token(coinOut, 6);
+                    const slippage = new Percent(5, 100);
+              
+                    const { amountOut, minAmountOut, currentPrice, executionPrice, priceImpact, fee } = Liquidity.computeAmountOut({
+                        poolKeys,
+                        poolInfo,
+                        amountIn,
+                        currencyOut,
+                        slippage,
+                    });
 
-    // SOL-USDC
-    const POOL_ID = "58oQChx4yWmvKdwLLZzBi4ChoCc2fqCUWBkwMihLYQo2"
+                    const excPr = () =>{
+                        if(executionPrice != null){
+                            return executionPrice.toFixed();
+                        }
+                    }
+                    //@ts-ignore
+                    console.log(
+                        amountOut.toFixed(),
+                        minAmountOut.toFixed(),
+                        currentPrice.toFixed(),
+                        excPr(),
+                        priceImpact.toFixed(),
+                        fee.toFixed(),
+                    );
 
-    const info = await getLiquidityInfo(connection, new PublicKey(POOL_ID), SERUM_PROGRAM_ID_V3)
+                    const { transaction, signers } = await Liquidity.makeSwapTransaction({
+                        connection,
+                        poolKeys,
+                        userKeys: {
+                            tokenAccounts,
+                            owner,
+                        },
+                        amountIn,
+                        amountOut: minAmountOut,
+                        fixedSide: "in",
+                    });
 
-    // @ts-ignore
-    console.log("base Vault:", info.baseVaultKey.toBase58(), info.baseVaultBalance);
-    // @ts-ignore
-    console.log("quote Vault:", info.quoteVaultKey.toBase58(), info.quoteVaultBalance);
-  
-    // @ts-ignore
-    console.log(`openOrders Account ${info.openOrdersKey.toBase58()}, base Serum book total: ${info.openOrdersTotalBase},quote Serum book total: ${info.openOrdersTotalQuote} `)
-  
-      // @ts-ignore
-    console.log(`base pnl: ${info.basePnl }, quote pnl: ${info.quotePnl}` );
+                    const signature = await connection.sendTransaction(transaction, [...signers, ownerKeypair], { skipPreflight: true });
+                    console.log(signature)
+                    //const trany = await connection.getParsedTransaction(txid)
 
-    // @ts-ignore
-    console.log(`Final base:${info.base}, quote:${info.quote}, priceInQuote: ${info.priceInQuote}, lpSupply:${info.lpSupply}` )
+                    //check transaction
+                    let timeNow = new Date().getTime();
+                    function checkTransactionError(timeNow: number, signature: string){
+                        let newtime = new Date().getTime();
+                        let tdiff = newtime - timeNow
+                        if(tdiff > 30000){
+                            return reject(new Error('Transaction not processed'));
+                        }
+                        const status = connection.getSignatureStatus(signature);
+                        status.then((status)=>{
+                            if(status.value?.confirmationStatus == 'processed'){
+                                if(status.value?.err){
+                                    console.log('error');
+                                    return reject(new Error('Transaction Failed'));
+                                }else{
+                                    return resolve();
+                                }
+                            }
+                            return checkTransactionError(timeNow, signature);
+                        })
+                    }
+                    checkTransactionError(timeNow, signature);
+                }
+            }
 
-    
-    // const allPoolKeys = await fetchAllPoolKeys(connection);
-    // const poolKeys = allPoolKeys.find((item) => item.id.toBase58() === RAY_USDC)
-    const poolKeys = await fetchPoolKeys(connection, new PublicKey(POOL_ID))
-
-
-    await swap(connection, poolKeys, ownerKeypair, tokenAccounts)
-
-    //await addLiquidity(connection, poolKeys, ownerKeypair, tokenAccounts)
-
-    //await removeLiquidity(connection, poolKeys, ownerKeypair, tokenAccounts)
-
-    const FIDA_RAY = "2dRNngAm729NzLbb1pzgHtfHvPqR4XHFmFyYK78EfEeX"
-    const RAY_USDC = "6UmmUiYoBjSrhakAobJw8BvkmJtDVxaeBtbt7rxWo1mg"
-
-    const fromPoolKeys = await fetchPoolKeys(connection, new PublicKey(FIDA_RAY))
-    const toPoolKeys = await fetchPoolKeys(connection, new PublicKey(RAY_USDC))
-    const FIDA_MINT_ID = fromPoolKeys.baseMint;
-    const USDC_MINT_ID = poolKeys.quoteMint;
-    const relatedPoolKeys = await getRouteRelated(connection, FIDA_MINT_ID, USDC_MINT_ID)
-
-    await routeSwap(connection, fromPoolKeys, toPoolKeys, ownerKeypair, tokenAccounts)
-
-    await tradeSwap(connection, FIDA_MINT_ID, USDC_MINT_ID, relatedPoolKeys, ownerKeypair, tokenAccounts)
-})()
+            catch(err){
+                reject(err)
+            }
+            
+        }
+        main();
+    })
+}

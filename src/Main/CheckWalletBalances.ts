@@ -1,7 +1,6 @@
-
 import { clusterApiUrl, Connection, PublicKey, LAMPORTS_PER_SOL } from "@solana/web3.js";
 
-function chekckWalletBalance(usdc:boolean){
+function chekckWalletBalance(coin: string){
     return new Promise<number>((resolve, reject) => {
 
         const connection = new Connection(clusterApiUrl("mainnet-beta"), "confirmed");
@@ -14,6 +13,10 @@ function chekckWalletBalance(usdc:boolean){
     
         let orcaMint = 'orcaEKTdK7LKz57vaAYr9QeNsVEPfiu6QeMU1kektZE'
         let mintWalletOrca = new PublicKey(orcaMint);
+
+        let rayMint = '4k3Dyjzvzp8eMZWUXbBCjEvwSkkk59S5iCNLY3QrkX6R'
+        let mintWalletray = new PublicKey(rayMint);
+
     
         const main = async () => {
             try {
@@ -38,11 +41,22 @@ function chekckWalletBalance(usdc:boolean){
                 console.log(`orca balance: ${balanceOrcaParsed}`)
                 let inBalOrca = parseInt(balanceOrcaParsed)
 
-                if(usdc){
-                    resolve(inBalUsdc);
-                }
-                else{
+                //ray
+                const balanceRay = await connection.getParsedTokenAccountsByOwner(
+                    wallet, { mint: mintWalletray }
+                );
+                const balanceRayParsed = balanceRay.value[0]?.account.data.parsed.info.tokenAmount.uiAmount;
+                console.log(`ray balance: ${balanceRayParsed}`)
+                let inBalRay = parseInt(balanceRayParsed)
+
+                if(coin == 'ORCA'){
                     resolve(inBalOrca);
+                }
+                else if(coin == 'RAY'){
+                    resolve(inBalRay);
+                }
+                else {
+                    resolve(inBalUsdc);
                 }
                 
             }
@@ -50,7 +64,6 @@ function chekckWalletBalance(usdc:boolean){
                 console.log(err)
                 reject(err)
             }
-            
             
         }
     
@@ -64,11 +77,9 @@ function chekckWalletBalance(usdc:boolean){
         })
 
     })
-
-
 }
 
-export function getBalance(uscdc:boolean){
-    return chekckWalletBalance(uscdc);
+export function getBalance(coin: string){
+    return chekckWalletBalance(coin);
 }
 

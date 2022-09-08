@@ -28,7 +28,7 @@ export class LoadBot{
                 console.log(marketData)
                 console.log('start new bot instance')
                 console.log(marketData.close)
-                const NewBot = new CryptoTradingBot(rt.pairing, rt.windowResolution, marketData, rt.secretKeyPath, 0.8954)
+                const NewBot = new CryptoTradingBot(rt.pairing, rt.windowResolution, marketData, rt.secretKeyPath, 0.8954, rt.dex)
                 console.log('startbotscript starting bot')
                 NewBot.startBot();
             }
