@@ -13,6 +13,7 @@ export class CryptoTradingBot {
     secretkeyPath
     price
     dex
+    stopLoss
 
     buySellTrigger
     bought
@@ -30,7 +31,8 @@ export class CryptoTradingBot {
         marketData: MarketDataObject,
         secretkeyPath: string,
         price: number,
-        dex: string
+        dex: string,
+        stopLoss: number
     ){
         this.pairing = pairing
         this.windowResolution = windowResolution
@@ -38,6 +40,7 @@ export class CryptoTradingBot {
         this.secretkeyPath = secretkeyPath
         this.price = price
         this.dex = dex
+        this.stopLoss = stopLoss
         
         this.buySellTrigger = true
         this.bought = false
@@ -101,14 +104,16 @@ export class CryptoTradingBot {
     //buying and selling
 
     buySellLogic(price: number, emaYesterday: number){
-        //buy
+        //make stoploss a % below the ema. defined in config
+        let stopLossDelta = emaYesterday * this.stopLoss;
+        let stopPrice = emaYesterday - stopLossDelta;
         if(price > emaYesterday){
             if(this.buySellTrigger && this.sold){
                 this.buySellTrigger = false
                 this.getBuy();
             }
         }
-        else if(this.price < emaYesterday){
+        else if(price < stopPrice){
             if(this.buySellTrigger && this.bought){
                 this.buySellTrigger = false
                 this.getSell();

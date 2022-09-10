@@ -5,5 +5,6 @@
     "emaInterval": "70",
     "cexData": "FTX",
     "dex": "raydium",
+    "stopLoss": 0.02,
     "data": null
 }

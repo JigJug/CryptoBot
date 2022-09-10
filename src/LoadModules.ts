@@ -37,6 +37,9 @@ export class LoadBot{
                 NewBot.startBot();
                 console.log('startbotscript starting bot')
             }
+            else {
+                console.log('no data');
+            }
             
 
         })

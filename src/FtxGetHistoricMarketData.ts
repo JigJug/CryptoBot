@@ -18,7 +18,7 @@ export function FtxGetHistoricMarketData(botConfig: BotConfig){
             return calcEmaStoreData(ret, emaPeriod, pairing1, botConfig.windowResolution);
         })
         .then((md) => {
-            console.log("complete ema")
+            console.log("ema complete")
             botConfig.data = md
             resolve(botConfig)
         })
