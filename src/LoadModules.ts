@@ -31,7 +31,8 @@ export class LoadBot{
                     marketData,
                     rt.secretKeyPath,
                     marketData.close,
-                    rt.dex
+                    rt.dex,
+                    rt.stopLoss
                 )
                 
                 NewBot.startBot();

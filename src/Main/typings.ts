@@ -22,6 +22,7 @@ export interface BotConfig {
     emaInterval: string;
     cexData: string;
     dex: string;
+    stopLoss: number
     data: null | MarketDataObject[]
 }
 
