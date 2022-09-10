@@ -1,5 +1,5 @@
 import { FtxGetHistoricMarketData } from "./newFtxGetHistoricMarketData";
-import { CryptoTradingBot } from "./Main/CryptoTradingBotTestUpdateEvents";
+import { CryptoTradingBot } from "./Main/CryptoTradingBot";
 const fs = require('fs')
 
 export class LoadBot{

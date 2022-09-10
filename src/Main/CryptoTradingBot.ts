@@ -1,4 +1,4 @@
-import { EMA } from './EMA'
+import { EMA } from './Stratergy/Indicators/EMA'
 import { LoadExchange } from './DexClients/ExchangeLoader'
 import { getBalance } from './CheckWalletBalances'
 import { EmiterCollection } from './EmiterCollection'

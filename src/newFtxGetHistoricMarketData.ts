@@ -1,6 +1,7 @@
 import { FtxClient } from './Main/FtxClient'
 import { StoreDataJson } from './Main/StoreDataToJson';
-import {EMA} from './Main/EMA';
+import {EMA} from './Main/Stratergy/Indicators/EMA';
+import { SMA } from './Main/Stratergy/Indicators/SMA';
 import { BotConfig} from './Main/typings';
 
 export function FtxGetHistoricMarketData(botConfig: BotConfig){
@@ -40,8 +41,9 @@ function calcEmaStoreData(ret:any, emaPeriod: number, pairing1: string, windowRe
         let priceToday: any;
 
         const getEMA = new EMA(emaPeriod);
+        const getSMA = new SMA(emaPeriod);
 
-        emaYesterday = getEMA.smaCalc(ret.result);
+        emaYesterday = getSMA.smaCalc(ret.result);
         ret.result[emaPeriod].ema = emaYesterday;
     
         const calcEma = (currentValue: any, index: any) => {
