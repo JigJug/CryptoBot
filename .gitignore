@@ -1,6 +1,6 @@
 node_modules
 app
-./config.json
-.gitignore
-./tsconfig.json
+D:\CryptoProject\DataCollector\config.json
+D:\CryptoProject\DataCollector\.gitignore
+D:\CryptoProject\DataCollector\tsconfig.json
 TestScripts
