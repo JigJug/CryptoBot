@@ -1,4 +1,4 @@
-import { FtxGetHistoricMarketData } from "./newFtxGetHistoricMarketData";
+import { FtxGetHistoricMarketData } from "./FtxGetHistoricMarketData";
 import { CryptoTradingBot } from "./Main/CryptoTradingBot";
 const fs = require('fs')
 
