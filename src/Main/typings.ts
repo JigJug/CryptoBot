@@ -12,7 +12,7 @@ export interface MarketDataObject {
     low: number;
     close: number;
     volume: number;
-    
+    ema: number;
 }
 
 export interface BotConfig {

@@ -81,7 +81,6 @@ export class CryptoTradingBot {
         this.dataEmiters.on('Price', (price: number) => {
             this.price = price;
             this.strategy.buySellLogic(price, this.indicators ,this.sold, this.bought, this.buySellTrigger)
-
         })
 
     }
@@ -102,7 +101,7 @@ export class CryptoTradingBot {
         this.dataEmiters.sendTimeFrameData(this.cexClient, lastTime, wr);
 
         this.dataEmiters.on('TimeFrameData', (md: MarketDataObject) => {
-            this.indicators = this.strategy.updateIndicators(md, this.indicators);
+            this.updateIndicators(md);
             this.updateMarketData(md);
             console.log('updated market data: \n' + this.marketData.time + '\n');
         })
@@ -200,6 +199,10 @@ export class CryptoTradingBot {
         this.marketData.low = md.low
         this.marketData.close = md.close
         this.marketData.volume = md.volume
+    }
+
+    updateIndicators(md: MarketDataObject){
+        this.indicators = this.strategy.updateIndicators(md, this.indicators);
     }
 
     getSecretKey():number[]{

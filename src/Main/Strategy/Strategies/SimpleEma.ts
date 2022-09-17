@@ -29,15 +29,16 @@ export class SimpleEmaStrategy{
             }
         }
 
-        else if(price < stopPrice){
-            if(buySellTrigger && bought){
+        else if(buySellTrigger && bought){
+            if(price < stopPrice){
                 this.sellEmmiter();
             }
         }
     }
 
     updateIndicators(md: MarketDataObject, indicators: indicators){
-        
+        indicators.ema =  this.calcEma(md.close, indicators.ema);
+        return indicators
     }
 
     calcEma(close: number, emaYesterday: number){
