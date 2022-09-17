@@ -41,7 +41,7 @@ export class RSI{
             }
         }
 
-        return averageGainLoss(data)
+        return averageGainLoss(data) 
 
     }
 
