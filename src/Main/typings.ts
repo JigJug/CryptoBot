@@ -12,7 +12,7 @@ export interface MarketDataObject {
     low: number;
     close: number;
     volume: number;
-    ema: number;
+    
 }
 
 export interface BotConfig {
@@ -59,4 +59,11 @@ export interface SingleMarketObject{
     volumeUsd24h: number;
     largeOrderThreshold: number;
     isEtfMarket: boolean;
+}
+
+export interface indicators {
+    ema: number;
+    rsi: number;
+    sma: number;
+    macd: number;
 }

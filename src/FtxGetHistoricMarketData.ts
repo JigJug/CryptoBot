@@ -1,4 +1,4 @@
-import { FtxClient } from './Main/FtxClient'
+import { FtxClient } from './Main/CexClients/FtxClient'
 import { StoreDataJson } from './Main/StoreDataToJson';
 import {EMA} from './Main/Strategy/Indicators/EMA';
 import { SMA } from './Main/Strategy/Indicators/SMA';

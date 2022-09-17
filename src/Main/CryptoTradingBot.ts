@@ -2,7 +2,9 @@ import { EMA } from './Strategy/Indicators/EMA'
 import { LoadExchange } from './DexClients/ExchangeLoader'
 import { getBalance } from './CheckWalletBalances'
 import { EmiterCollection } from './EmiterCollection'
-import { MarketDataObject, SecretKeyObj } from './typings'
+import { indicators, MarketDataObject, SecretKeyObj } from './typings'
+import { LoadStrategy } from './Strategy/LoadStrategy'
+import { FtxClient } from './CexClients/FtxClient'
 const fs = require('fs');
 
 
@@ -14,15 +16,17 @@ export class CryptoTradingBot {
     price
     dex
     stopLoss
+    indicators
 
     buySellTrigger
     bought
     sold
     coin
+    cexClient
     dataEmiters
-    ema
     dexClient
     secretKey
+    strategy
     
     
     constructor(
@@ -32,7 +36,8 @@ export class CryptoTradingBot {
         secretkeyPath: string,
         price: number,
         dex: string,
-        stopLoss: number
+        stopLoss: number,
+        indicators: indicators
     ){
         this.pairing = pairing
         this.windowResolution = windowResolution
@@ -41,15 +46,17 @@ export class CryptoTradingBot {
         this.price = price
         this.dex = dex
         this.stopLoss = stopLoss
+        this.indicators = indicators
         
         this.buySellTrigger = true
         this.bought = false
         this.sold = true
         this.coin = 'RAY'
-        this.dataEmiters = new EmiterCollection(this.pairing, this.windowResolution)
-        this.ema = new EMA(70)
+        this.cexClient = new FtxClient(this.pairing, this.windowResolution)
+        this.dataEmiters = new EmiterCollection()
         this.dexClient = new LoadExchange(this.dex).swapClient();
         this.secretKey = this.getSecretKey();
+        this.strategy = this.getStrategy();
     }
 
     startBot(){
@@ -59,8 +66,9 @@ export class CryptoTradingBot {
 
     setStartBot(){
         this.getPrice();
-        this.getFourHourData();
+        this.getTimeFrameData();
         this.botStatusUpdate();
+        this.buySellListeners();
     }
 
     //current price
@@ -69,10 +77,11 @@ export class CryptoTradingBot {
     }
 
     setPrice(){
-        this.dataEmiters.sendPrice();
+        this.dataEmiters.sendPrice(this.cexClient);
         this.dataEmiters.on('Price', (price: number) => {
             this.price = price;
-            this.buySellLogic(price, this.marketData.ema);
+            this.strategy.buySellLogic(price, this.indicators ,this.sold, this.bought, this.buySellTrigger)
+
         })
 
     }
@@ -82,17 +91,18 @@ export class CryptoTradingBot {
 
 
     //4hour data
-    getFourHourData(){
-        return this.setFourHourData();
+    getTimeFrameData(){
+        return this.setTimeFrameData();
     }
-    setFourHourData(){
+
+    setTimeFrameData(){
         let lastTime = this.marketData.time
         let wr = parseInt(this.windowResolution);
-        this.dataEmiters.sendFourHourData(lastTime, wr);
-        this.dataEmiters.on('FourHourData', (md: MarketDataObject) => {
-            console.log('set4hrdata')
-            md.ema =  this.calcEma(md.close, this.marketData.ema);
-            
+
+        this.dataEmiters.sendTimeFrameData(this.cexClient, lastTime, wr);
+
+        this.dataEmiters.on('TimeFrameData', (md: MarketDataObject) => {
+            this.indicators = this.strategy.updateIndicators(md, this.indicators);
             this.updateMarketData(md);
             console.log('updated market data: \n' + this.marketData.time + '\n');
         })
@@ -102,24 +112,23 @@ export class CryptoTradingBot {
 
 
     //buying and selling
+    buySellListeners(){
 
-    buySellLogic(price: number, emaYesterday: number){
-        //make stoploss a % below the ema. defined in config
-        let stopLossDelta = emaYesterday * this.stopLoss;
-        let stopPrice = emaYesterday - stopLossDelta;
-        if(price > emaYesterday){
-            if(this.buySellTrigger && this.sold){
-                this.buySellTrigger = false
+        this.dataEmiters.on('Buy', (buy) => {
+            if(buy && this.buySellTrigger && this.sold){
                 this.getBuy();
             }
-        }
-        else if(price < stopPrice){
-            if(this.buySellTrigger && this.bought){
-                this.buySellTrigger = false
+        });
+
+        this.dataEmiters.on('Sell', (sell) => {
+            if(sell && this.buySellTrigger && this.bought){
                 this.getSell();
             }
-        }
+        })
+
     }
+
+
 
 
     getBuy(){
@@ -142,7 +151,6 @@ export class CryptoTradingBot {
             this.buySellTrigger = true
         });
     }
-            
 
 
     getSell(){
@@ -168,18 +176,13 @@ export class CryptoTradingBot {
 
 
 
-    calcEma(close: number, emaYesterday: number){
-        console.log('calcing ema')
-        const ema = this.ema;
-        return ema.emaCalc(close, emaYesterday);
-    }
+
 
     botStatusUpdate(){
         setInterval(()=>{
             console.log(
                 `lastdatatime: ${this.marketData.startTime}\n
                 price: ${this.price}\n
-                ema: ${this.marketData.ema}\n
                 volume: ${this.marketData.volume}\n
                 bought: ${this.bought}\n
                 sold: ${this.sold}\n`
@@ -197,7 +200,6 @@ export class CryptoTradingBot {
         this.marketData.low = md.low
         this.marketData.close = md.close
         this.marketData.volume = md.volume
-        this.marketData.ema = md.ema
     }
 
     getSecretKey():number[]{
@@ -213,6 +215,15 @@ export class CryptoTradingBot {
         });
         const secretKey: SecretKeyObj = JSON.parse(secretKeyString);
         return secretKey.pk
+    }
+
+    getStrategy(){
+        const strategy = this.setStrategy();
+        return new strategy(this.stopLoss, this.dataEmiters.sendBuySignal, this.dataEmiters.sendSellSignal)
+    }
+
+    setStrategy(){
+        return new LoadStrategy('simpleema').loadStrategy();
     }
 
     //getCoin(): string{

@@ -1,5 +1,5 @@
-import { HttpsGetRequest } from "./HttpsGetRequest";
-import { FtxApiObject } from "./typings";
+import { HttpsGetRequest } from "../HttpsGetRequest";
+import { FtxApiObject } from "../typings";
 
 export class FtxClient {
 

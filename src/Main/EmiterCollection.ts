@@ -1,28 +1,17 @@
-import { FtxClient } from './FtxClient';
+import { FtxClient } from './CexClients/FtxClient';
 import { EventEmitter } from 'events';
 import {MarketDataObject, SingleMarketObject} from './typings'
 
 
 export class EmiterCollection extends EventEmitter {
 
-    marketName
-    windowResolution
-
-    exchangeClient
-
-    constructor(marketname: string, windowResolution: string){
+    constructor(){
         super();
-        this.marketName = marketname
-        this.windowResolution = windowResolution
-
-        this.exchangeClient = new FtxClient(this.marketName, this.windowResolution);
     }
 
+    sendPrice(exchangeClient: FtxClient){
 
-    
-    sendPrice(){
-
-        let cli = this.exchangeClient;
+        let cli = exchangeClient;
 
         const fetchPrie = async () => {
             try{
@@ -41,17 +30,17 @@ export class EmiterCollection extends EventEmitter {
 
 
     
-    sendFourHourData(lastTime: number, windowResolution: number){
+    sendTimeFrameData(exchangeClient: FtxClient, lastTime: number, windowResolution: number){
 
-        let fourHour: number = 1000 * windowResolution;
+        let TimeFrame: number = 1000 * windowResolution;
         let timeMills: number
         let timeDiff: number
         
-        let cli = this.exchangeClient;
+        let cli = exchangeClient;
         const routineData = async () => {
             try {
                 const getMarketData = await cli.ftxGetMarket(true, cli.marketDataEndPoint);
-                this.emit('FourHourData', getMarketData)
+                this.emit('TimeFrameData', getMarketData);
             }
             catch(err){
                 console.log(err)
@@ -62,11 +51,20 @@ export class EmiterCollection extends EventEmitter {
         setInterval(() => {
             timeMills = new Date().getTime();
             timeDiff = timeMills - lastTime
-            if(timeDiff > fourHour){
-                lastTime = lastTime + fourHour
+            if(timeDiff > TimeFrame){
+                lastTime = lastTime + TimeFrame
                 routineData();
             }
         },6000)
+    }
+
+
+    sendBuySignal(){
+        this.emit('Buy', true);
+    }
+
+    sendSellSignal(){
+        this.emit('Sell', true);
     }
 
 
