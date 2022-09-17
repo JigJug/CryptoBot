@@ -1,7 +1,7 @@
 import { FtxClient } from './Main/FtxClient'
 import { StoreDataJson } from './Main/StoreDataToJson';
-import {EMA} from './Main/Stratergy/Indicators/EMA';
-import { SMA } from './Main/Stratergy/Indicators/SMA';
+import {EMA} from './Main/Strategy/Indicators/EMA';
+import { SMA } from './Main/Strategy/Indicators/SMA';
 import { BotConfig} from './Main/typings';
 
 export function FtxGetHistoricMarketData(botConfig: BotConfig){
