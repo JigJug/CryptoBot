@@ -104,6 +104,7 @@ export class CryptoTradingBot {
             this.updateIndicators(md);
             this.updateMarketData(md);
             console.log('updated market data: \n' + this.marketData.time + '\n');
+            console.log('ema:: ',  this.indicators.ema)
         })
 
     }

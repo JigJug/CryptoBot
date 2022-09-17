@@ -37,7 +37,7 @@ export class SimpleEmaStrategy{
     }
 
     updateIndicators(md: MarketDataObject, indicators: indicators){
-        indicators.ema =  this.calcEma(md.close, indicators.ema);
+        indicators.ema = this.calcEma(md.close, indicators.ema);
         return indicators
     }
 
