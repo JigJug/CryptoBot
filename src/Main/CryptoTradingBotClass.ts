@@ -8,6 +8,7 @@ import { MarketDataGrabber } from './MarketDataGrabber'
 const fs = require('fs');
 
 
+
 export class CryptoTradingBot {
     pairing
     windowResolution

@@ -1,5 +1,5 @@
 import { FtxGetHistoricMarketData } from "./FtxGetHistoricMarketData";
-import { CryptoTradingBot } from "./Main/CryptoTradingBot";
+import { CryptoTradingBot } from "./Main/CryptoTradingBotClass";
 import { indicators } from "./Main/typings";
 const fs = require('fs')
 

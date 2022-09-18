@@ -1,4 +1,4 @@
-import { startBot } from "./LoadBot";
+import { startBot } from "./StartBot";
 
 
 startBot().loadBot();
