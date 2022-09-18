@@ -1,5 +1,5 @@
-import { FtxClient } from './Main/CexClients/FtxClient'
-import { StoreDataJson } from './Main/StoreDataToJson';
+import { FtxClient } from './Main/DataClients/FtxClient'
+import { StoreDataJson } from './Main/Utils/StoreDataToJson';
 import {EMA} from './Main/Strategy/Indicators/EMA';
 import { SMA } from './Main/Strategy/Indicators/SMA';
 import { BotConfig} from './Main/typings';

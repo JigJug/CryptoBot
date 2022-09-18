@@ -4,15 +4,12 @@ import { EMA } from "../Indicators/EMA"
 export class SimpleEmaStrategy{
 
     stopLoss
-    buyEmmiter
-    sellEmmiter
+    eventEmitter
     ema
 
-
-    constructor(stopLoss: number, buyEmmiter: Function, sellEmitter: Function){
+    constructor(stopLoss: number, eventEmitter: NodeJS.EventEmitter){
         this.stopLoss = stopLoss
-        this.buyEmmiter = buyEmmiter
-        this.sellEmmiter = sellEmitter
+        this.eventEmitter = eventEmitter
         this.ema = new EMA(70);
     }
 
@@ -25,13 +22,15 @@ export class SimpleEmaStrategy{
 
         if(buySellTrigger && sold){
             if(price > ema){
-                this.buyEmmiter();
+                console.log('buyemitter trigger', price, ema)
+                this.eventEmitter.emit('Buy', true);
             }
         }
 
         else if(buySellTrigger && bought){
             if(price < stopPrice){
-                this.sellEmmiter();
+                console.log('sellemitter trigger', price, ema)
+                this.eventEmitter.emit('Sell', true);
             }
         }
     }

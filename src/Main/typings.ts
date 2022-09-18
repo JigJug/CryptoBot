@@ -67,3 +67,7 @@ export interface indicators {
     sma: number;
     macd: number;
 }
+
+export interface CexClient {
+    
+}

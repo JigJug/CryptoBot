@@ -11,7 +11,7 @@ export class LoadBot{
 
     loadBot(){
 
-        let configPAth = 'D:\\CryptoProject\\DataCollector\\config.json'
+        let configPAth = 'D:\\CryptoProject\\BotConfigs\\config.json'
         let botConfigRaw = fs.readFileSync(configPAth, "utf8", (err: Error, data: any)=>{
             if(err){
                 console.log(err)
