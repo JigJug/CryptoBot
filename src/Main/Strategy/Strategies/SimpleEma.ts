@@ -1,4 +1,4 @@
-import { indicators, MarketDataObject } from "../../typings"
+import { indicators, MarketDataObject, SingleMarketObject } from "../../typings"
 import { EMA } from "../Indicators/EMA"
 
 export class SimpleEmaStrategy{
@@ -14,22 +14,23 @@ export class SimpleEmaStrategy{
     }
 
 
-    buySellLogic(price: number, indicators: indicators, sold: boolean, bought: boolean, buySellTrigger: boolean){
+    buySellLogic(singleMArketData: SingleMarketObject, indicators: indicators, sold: boolean, bought: boolean, buySellTrigger: boolean){
         //make stoploss a % below the ema. defined in config
-        let ema = indicators.ema
+        let price = singleMArketData.price;
+        let ema = indicators.ema;
         let stopLossDelta = ema * this.stopLoss;
         let stopPrice = ema - stopLossDelta;
 
         if(buySellTrigger && sold){
             if(price > ema){
-                console.log('buyemitter trigger', price, ema)
+                console.log('buyemitter trigger', price, ema);
                 this.eventEmitter.emit('Buy', true);
             }
         }
 
         else if(buySellTrigger && bought){
             if(price < stopPrice){
-                console.log('sellemitter trigger', price, ema)
+                console.log('sellemitter trigger', price, ema);
                 this.eventEmitter.emit('Sell', true);
             }
         }

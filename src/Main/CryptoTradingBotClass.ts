@@ -1,6 +1,6 @@
 import { LoadExchange } from './DexClients/ExchangeLoader'
 import { getBalance } from './Utils/CheckWalletBalances'
-import { indicators, MarketDataObject, SecretKeyObj } from './typings'
+import { indicators, MarketDataObject, SecretKeyObj, SingleMarketObject } from './typings'
 import { LoadStrategy } from './Strategy/LoadStrategy'
 import { FtxClient } from './DataClients/FtxClient'
 import { EventEmitter } from 'events';
@@ -64,12 +64,10 @@ export class CryptoTradingBot {
     }
 
     startBot(){
-        console.log(' cryptobotclass:: running startBot')
         this.setStartBot();
     }
 
     setStartBot(){
-        
         this.getPrice();
         this.getTimeFrameData();
         this.botStatusUpdate();
@@ -84,10 +82,10 @@ export class CryptoTradingBot {
     }
 
     setPrice(){
-        this.marketDataGrabber.sendPrice();
-        this.events.on('Price', (price: number) => {
-            this.price = price;
-            this.strategy.buySellLogic(price, this.indicators ,this.sold, this.bought, this.buySellTrigger)
+        this.marketDataGrabber.sendSingleMarketData();
+        this.events.on('SingleMarketData', (SingleMarketData: SingleMarketObject) => {
+            this.price = SingleMarketData.price;
+            this.strategy.buySellLogic(SingleMarketData, this.indicators ,this.sold, this.bought, this.buySellTrigger);
         })
 
     }
@@ -103,7 +101,7 @@ export class CryptoTradingBot {
     }
 
     setTimeFrameData(){
-        let lastTime = this.marketData.time
+        let lastTime = this.marketData.time;
 
         this.marketDataGrabber.sendTimeFrameData(lastTime);
 
@@ -111,7 +109,7 @@ export class CryptoTradingBot {
             this.updateIndicators(md);
             this.updateMarketData(md);
             console.log('updated market data: \n' + this.marketData.time + '\n');
-            console.log('ema:: ',  this.indicators.ema)
+            console.log('ema:: ',  this.indicators.ema);
         })
 
     }
@@ -122,14 +120,14 @@ export class CryptoTradingBot {
     buySellListeners(){
 
         this.events.on('Buy', (buy: boolean) => {
-            console.log('recieved buy signal')
+            console.log('recieved buy signal');
             if(buy && this.buySellTrigger && this.sold){
                 this.getBuy();
             }
         });
 
         this.events.on('Sell', (sell: boolean) => {
-            console.log('recieved sell signal')
+            console.log('recieved sell signal');
             if(sell && this.buySellTrigger && this.bought){
                 this.getSell();
             }
@@ -144,19 +142,19 @@ export class CryptoTradingBot {
     }
     
     buy(side: string){
-        this.buySellTrigger = false
+        this.buySellTrigger = false;
         getBalance('USD')
         .then((bal) =>{
-            return this.dexClient(bal, side, this.secretKey)
+            return this.dexClient(bal, side, this.secretKey);
         })
         .then(()=>{
-            this.buySellTrigger = true
-            this.bought = true 
-            this.sold = false        
+            this.buySellTrigger = true;
+            this.bought = true;
+            this.sold = false;
         })
         .catch((err: Error) => {
             console.log(err);
-            this.buySellTrigger = true
+            this.buySellTrigger = true;
         });
     }
 
@@ -167,19 +165,19 @@ export class CryptoTradingBot {
     }
 
     sell(side: string){
-        this.buySellTrigger = false
+        this.buySellTrigger = false;
         getBalance(this.coin)
         .then((bal) => {
-            return this.dexClient(bal, side, this.secretKey)
+            return this.dexClient(bal, side, this.secretKey);
         })
         .then(()=>{
-            this.buySellTrigger = true
-            this.sold = true
-            this.bought = false
+            this.buySellTrigger = true;
+            this.sold = true;
+            this.bought = false;
         })
         .catch((err: Error) => {
             console.log(err);
-            this.buySellTrigger = true
+            this.buySellTrigger = true;
         });
     }
 
@@ -195,20 +193,20 @@ export class CryptoTradingBot {
                 sold: ${this.sold}\n
                 buyselltrigger : ${this.buySellTrigger}`
             );
-        }, 120000)
+        }, 120000);
     }
 
     
 
     updateMarketData(md: MarketDataObject){
-        console.log('updating market data' )
-        this.marketData.startTime = md.startTime
-        this.marketData.time = md.time
-        this.marketData.open = md.open
-        this.marketData.high = md.high
-        this.marketData.low = md.low
-        this.marketData.close = md.close
-        this.marketData.volume = md.volume
+        console.log('updating market data' );
+        this.marketData.startTime = md.startTime;
+        this.marketData.time = md.time;
+        this.marketData.open = md.open;
+        this.marketData.high = md.high;
+        this.marketData.low = md.low;
+        this.marketData.close = md.close;
+        this.marketData.volume = md.volume;
     }
 
     updateIndicators(md: MarketDataObject){
@@ -224,7 +222,7 @@ export class CryptoTradingBot {
     setSecretKey():number[]{
         let secretKeyString = fs.readFileSync(this.secretkeyPath, "utf8", (err: Error, data: any)=>{
             if(err){
-                console.log(err)
+                console.log(err);
                 return
             }
         });

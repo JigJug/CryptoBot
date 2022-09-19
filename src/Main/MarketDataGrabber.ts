@@ -11,12 +11,12 @@ export class MarketDataGrabber {
         this.eventEmitter = eventEmitter
     }
 
-    sendPrice(){
+    sendSingleMarketData(){
 
-        const fetchPrie = async () => {
+        const fetchSingleMarketData = async () => {
             try{
-                const price = await this.client.ftxGetMarket(false, this.client.priceEndpoint);
-                this.eventEmitter.emit('Price', price.result.price);
+                const singleMArketData = await this.client.ftxGetMarket(false, this.client.priceEndpoint);
+                this.eventEmitter.emit('SingleMarketData', singleMArketData.result);
             }
             catch(err){
                 console.log(err);
@@ -24,7 +24,7 @@ export class MarketDataGrabber {
         }
         
         setInterval(() => {
-            fetchPrie();
+            fetchSingleMarketData();
         },5000)
     }
 
