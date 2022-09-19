@@ -21,6 +21,7 @@ Set up the config.json. Enter the desired coin pairing that you want to trade wi
 ***
 Open a command window to the root directory of the project and type 'npm start'.
 ***
+## Notes
 ***
 This project lays the groundwork for users to create their own strategies and simply add the script to the strategies folder by following simple instructions with a function template which will be released in due course.
 ***
