@@ -13,13 +13,13 @@ Download the project folders and install NodeJS and NPM to run this project.
 Set up a cryptocurrency wallet on your network of choice (only solana at the moment) and add some funds. Create a folder that will contain your secret key with the given SK.json template. Add your secret key to the SK.json and save it in the folder you just created. In the config.json file add in the path to your secret key file.
 
 ### Set up the config file
-> * open config.json
+> * Open config.json
 > * Enter the desired coin pairing that you want to trade with eg. 'SOL/USD'
 > * Enter the time window that you want to trade in (eg. 1D, 4h, 1h, 30m, 15m, 5m) in seconds eg. 300 = 5m
 > * Enter the exchange data source that the bot will pull market data from eg. 'FTX'
 > * Enter the dex that you want the bot to trade on eg. 'raydium'
 > * Enter your desired strategy (so far the bot only has a simple EMA strategy)
-> * Add your stoploss % eg. 0.2
+> * Add your stoploss % eg. 0.02
 
 ### Start the bot
 Open a command window to the root directory of the project and type:
