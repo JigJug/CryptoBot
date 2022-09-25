@@ -20,8 +20,6 @@ export function raydiumApiSwap(ammount: number, side: string, secretKey: number[
             
             try {
                 const tokenAccounts = await getTokenAccountsByOwner(connection, owner);
-                //const RAY_USDC = "6UmmUiYoBjSrhakAobJw8BvkmJtDVxaeBtbt7rxWo1mg";
-                //const SOL_USDC = '58oQChx4yWmvKdwLLZzBi4ChoCc2fqCUWBkwMihLYQo2';
                 console.log('connected token account')
                 const poolKeys = await fetchPoolKeys(connection, new PublicKey(fromRaydiumPools));
                 console.log('fetched pool keys')
