@@ -2,12 +2,16 @@ import { Connection, Keypair, PublicKey } from "@solana/web3.js";
 import { Liquidity, Token, TokenAmount, Percent } from "@raydium-io/raydium-sdk";
 import { fetchPoolKeys } from "./util_mainnet";
 import { getTokenAccountsByOwner} from "./util";
-import { rejects } from "assert";
 
-export function raydiumApiSwap(ammount: number, side: string, secretKey: number[], poolKey: string){
+
+
+export function raydiumApiSwap(ammount: number, side: string, secretKey: number[], pairing: string){
     return new Promise<void>((resolve, reject) => {
 
         const swap = async () => {
+            let fromRaydiumPools: RaydiumPools
+            let raydiumPairing: string = pairing.replace('/', '_')
+            fromRaydiumPools = RaydiumPools[raydiumPairing as keyof typeof RaydiumPools]
 
             const connection = new Connection("https://solana-api.projectserum.com", "confirmed");
             const skBuffer = Buffer.from(secretKey);
@@ -19,7 +23,7 @@ export function raydiumApiSwap(ammount: number, side: string, secretKey: number[
                 //const RAY_USDC = "6UmmUiYoBjSrhakAobJw8BvkmJtDVxaeBtbt7rxWo1mg";
                 //const SOL_USDC = '58oQChx4yWmvKdwLLZzBi4ChoCc2fqCUWBkwMihLYQo2';
                 console.log('connected token account')
-                const poolKeys = await fetchPoolKeys(connection, new PublicKey(poolKey));
+                const poolKeys = await fetchPoolKeys(connection, new PublicKey(fromRaydiumPools));
                 console.log('fetched pool keys')
                 
                 if (poolKeys) {
@@ -78,42 +82,37 @@ export function raydiumApiSwap(ammount: number, side: string, secretKey: number[
                     const signature = await connection.sendTransaction(transaction, [...signers, ownerKeypair], { skipPreflight: true });
                     console.log(signature);
 
+
                     //check transaction
                     let timeNow = new Date().getTime();
-                    let checkingTransaction = true
-                    let confirmation = true
 
-                    await new Promise((resolve, reject)=>{
-                        let status = connection.getSignatureStatus(signature);
-                        status().then
-                    })
+                    function checkTransactionError(timeNow: number, signature: string){
 
-                    do{
                         let newtime = new Date().getTime();
-                        let tdiff = newtime - timeNow;
+                        let tdiff = newtime - timeNow
                         if(tdiff > 30000){
-                            checkingTransaction = false
+                            return reject(new Error('Transaction not processed'));
                         }
-                        console.log('checking transactin');
-                        const status = await connection.getSignatureStatus(signature);
 
-                        if(status.value?.confirmationStatus == 'confirmed'){
-                            console.log('transaction confirmed.. checking for error');
-                            if(status.value?.err){
-                                console.log('error');
-                                confirmation = false
-                                checkingTransaction = false
+                        const checkConfirmation = async () => {
+                            const status = await connection.getSignatureStatus(signature);
+                            
+                            if(status.value?.confirmationStatus == 'confirmed'){
+                                if(status.value?.err){
+                                    console.log('error');
+                                    return reject(new Error('Transaction Failed'));
+                                }else{
+                                    return resolve();
+                                }
                             }
+                            checkTransactionError(timeNow, signature);
+                            
                         }
-                    }while(checkingTransaction);
-
-                    if(confirmation){
-                        resolve()
-                    }
-                    else{
-                        reject(new Error('Transaction Failed'))
+                        return checkConfirmation();
+                        
                     }
 
+                    checkTransactionError(timeNow, signature);
                 }
             }
 
@@ -125,5 +124,7 @@ export function raydiumApiSwap(ammount: number, side: string, secretKey: number[
         swap();
     })
 }
+
+
 
 
