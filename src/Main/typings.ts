@@ -71,3 +71,7 @@ export interface indicators {
 export interface CexClient {
     
 }
+
+export interface PoolList {
+    
+}

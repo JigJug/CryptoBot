@@ -145,7 +145,7 @@ export class CryptoTradingBot {
         this.buySellTrigger = false;
         getBalance('USD')
         .then((bal) =>{
-            return this.dexClient(bal, side, this.secretKey);
+            return this.dexClient(bal, side, this.secretKey, this.pairing);
         })
         .then(()=>{
             this.buySellTrigger = true;
@@ -168,7 +168,7 @@ export class CryptoTradingBot {
         this.buySellTrigger = false;
         getBalance(this.coin)
         .then((bal) => {
-            return this.dexClient(bal, side, this.secretKey);
+            return this.dexClient(bal, side, this.secretKey, this.pairing);
         })
         .then(()=>{
             this.buySellTrigger = true;

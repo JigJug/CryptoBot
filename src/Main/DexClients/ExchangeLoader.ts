@@ -1,5 +1,5 @@
-import { orcaApiSwap } from "./OrcaSwaps/orcaSwapOrcaUsdc";
-import { raydiumApiSwap } from "./RaydiumSwaps/RaydiumSwapRayUsdc"
+import { orcaApiSwap } from "./OrcaSwaps/orcaSwap";
+import { raydiumApiSwap } from "./RaydiumSwaps/RaydiumSwap"
 
 
 export class LoadExchange{
@@ -14,8 +14,15 @@ export class LoadExchange{
         if(this.exchange == 'orca'){
             return this.getOrca();
         }
-        else{
+        else if(this.exchange == 'raydium'){
             return this.getRaydium();
+        }
+        else{
+            return () => {
+                return new Promise((reject)=>{
+                    reject(new Error('can not load exchange'))
+                })
+            }
         }
     }
 
