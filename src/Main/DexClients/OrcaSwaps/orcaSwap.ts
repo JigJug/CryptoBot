@@ -10,9 +10,8 @@ export function orcaApiSwap(ammount: number, side: string, secretKey: number[], 
 
             /*** Setup ***/
             //Get the orca pool from pairing
-            let fromOrcaPoolConfig: OrcaPoolConfig
             let orcaPairing: string = pairing.replace('/', '_')
-            fromOrcaPoolConfig = OrcaPoolConfig[orcaPairing as keyof typeof OrcaPoolConfig]
+            const fromOrcaPoolConfig = OrcaPoolConfig[orcaPairing as keyof typeof OrcaPoolConfig]
             
 
             //Read secret key file to get owner keypair2

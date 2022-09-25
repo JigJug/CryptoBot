@@ -9,9 +9,9 @@ export function raydiumApiSwap(ammount: number, side: string, secretKey: number[
     return new Promise<void>((resolve, reject) => {
 
         const swap = async () => {
-            let fromRaydiumPools: RaydiumPools
+            
             let raydiumPairing: string = pairing.replace('/', '_')
-            fromRaydiumPools = RaydiumPools[raydiumPairing as keyof typeof RaydiumPools]
+            const fromRaydiumPools = RaydiumPools[raydiumPairing as keyof typeof RaydiumPools]
 
             const connection = new Connection("https://solana-api.projectserum.com", "confirmed");
             const skBuffer = Buffer.from(secretKey);
