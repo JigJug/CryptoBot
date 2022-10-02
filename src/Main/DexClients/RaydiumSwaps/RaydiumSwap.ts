@@ -2,6 +2,7 @@ import { Connection, Keypair, PublicKey } from "@solana/web3.js";
 import { Liquidity, Token, TokenAmount, Percent } from "@raydium-io/raydium-sdk";
 import { fetchPoolKeys } from "./util_mainnet";
 import { getTokenAccountsByOwner} from "./util";
+import { RaydiumPools } from "./RaydiumPools";
 
 
 
@@ -12,17 +13,21 @@ export function raydiumApiSwap(ammount: number, side: string, secretKey: number[
             
             let raydiumPairing: string = pairing.replace('/', '_')
             const fromRaydiumPools = RaydiumPools[raydiumPairing as keyof typeof RaydiumPools]
+            console.log(`fetched pool key ${raydiumPairing}: ${fromRaydiumPools}`);
 
             const connection = new Connection("https://solana-api.projectserum.com", "confirmed");
             const skBuffer = Buffer.from(secretKey);
             const ownerKeypair = Keypair.fromSecretKey(skBuffer);
             const owner = ownerKeypair.publicKey;
+
+            const pool = "6UmmUiYoBjSrhakAobJw8BvkmJtDVxaeBtbt7rxWo1mg"
             
             try {
                 const tokenAccounts = await getTokenAccountsByOwner(connection, owner);
                 console.log('connected token account')
-                const poolKeys = await fetchPoolKeys(connection, new PublicKey(fromRaydiumPools));
-                console.log('fetched pool keys')
+                const poolKeys = await fetchPoolKeys(connection, new PublicKey(pool));
+                console.log(`fetched pool keys: ${poolKeys}`)
+                console.log(poolKeys.marketBids)
                 
                 if (poolKeys) {
                     const poolInfo = await Liquidity.fetchInfo({ connection, poolKeys });
