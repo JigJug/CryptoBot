@@ -5,7 +5,7 @@ import { LoadStrategy } from './Strategy/LoadStrategy'
 import { FtxClient } from './DataClients/FtxClient'
 import { EventEmitter } from 'events';
 import { MarketDataGrabber } from './MarketDataGrabber'
-const fs = require('fs');
+import * as fs from 'fs'
 
 
 
@@ -55,12 +55,12 @@ export class CryptoTradingBot {
         this.sold = true
         this.coin = 'RAY'
         //load the data and dex clients, emitters, secretkey and strategy
-        this.events = this.getEventEmitter();
-        this.dataClient = this.getDataClient();
-        this.marketDataGrabber = this.getMarketDataGrabber();
-        this.dexClient = this.getDex();
-        this.secretKey = this.getSecretKey();
-        this.strategy = this.getStrategy();
+        this.events = this.setEventEmitter();
+        this.dataClient = this.setDataClient();
+        this.marketDataGrabber = this.setMarketDataGrabber();
+        this.dexClient = this.setDex();
+        this.secretKey = this.setSecretKey();
+        this.strategy = this.setStrategy();
     }
 
     startBot(){
@@ -68,8 +68,8 @@ export class CryptoTradingBot {
     }
 
     setStartBot(){
-        this.getPrice();
-        this.getTimeFrameData();
+        this.setPrice();
+        this.setTimeFrameData();
         this.botStatusUpdate();
         this.buySellListeners();
     }
@@ -77,11 +77,11 @@ export class CryptoTradingBot {
 
 
     //current price
-    getPrice(){
-        return this.setPrice();
+    setPrice(){
+        return this.getPrice();
     }
 
-    setPrice(){
+    getPrice(){
         this.marketDataGrabber.sendSingleMarketData();
         this.events.on('SingleMarketData', (SingleMarketData: SingleMarketObject) => {
             this.price = SingleMarketData.price;
@@ -95,12 +95,12 @@ export class CryptoTradingBot {
 
 
 
-    //4hour data
-    getTimeFrameData(){
-        return this.setTimeFrameData();
+    //market data
+    setTimeFrameData(){
+        return this.getTimeFrameData();
     }
 
-    setTimeFrameData(){
+    getTimeFrameData(){
         let lastTime = this.marketData.time;
 
         this.marketDataGrabber.sendTimeFrameData(lastTime);
@@ -145,9 +145,10 @@ export class CryptoTradingBot {
         this.buySellTrigger = false;
         getBalance('USD')
         .then((bal) =>{
-            return this.dexClient(bal, side, this.secretKey);
+            return this.dexClient(bal, side, this.secretKey, this.pairing);
         })
         .then(()=>{
+            console.log('bought')
             this.buySellTrigger = true;
             this.bought = true;
             this.sold = false;
@@ -168,7 +169,7 @@ export class CryptoTradingBot {
         this.buySellTrigger = false;
         getBalance(this.coin)
         .then((bal) => {
-            return this.dexClient(bal, side, this.secretKey);
+            return this.dexClient(bal, side, this.secretKey, this.pairing);
         })
         .then(()=>{
             this.buySellTrigger = true;
@@ -215,43 +216,38 @@ export class CryptoTradingBot {
 
 
 
-    getSecretKey():number[]{
-        return this.setSecretKey();
+    setSecretKey():number[]{
+        return this.getSecretKey();
     }
 
-    setSecretKey():number[]{
-        let secretKeyString = fs.readFileSync(this.secretkeyPath, "utf8", (err: Error, data: any)=>{
-            if(err){
-                console.log(err);
-                return
-            }
-        });
+    getSecretKey():number[]{
+        let secretKeyString = fs.readFileSync(this.secretkeyPath, "utf8");
         const secretKey: SecretKeyObj = JSON.parse(secretKeyString);
         return secretKey.pk
     }
 
-    getEventEmitter(){
+    setEventEmitter(){
         return new EventEmitter();
     }
 
-    getDataClient(){
+    setDataClient(){
         return new FtxClient(this.pairing, this.windowResolution);
     }
 
-    getMarketDataGrabber(){
+    setMarketDataGrabber(){
         return new MarketDataGrabber(this.dataClient, this.events);
     }
 
-    getStrategy(){
-        const strategy = this.setStrategy();
+    setStrategy(){
+        const strategy = this.getStrategy();
         return new strategy(this.stopLoss, this.events)
     }
 
-    setStrategy(){
+    getStrategy(){
         return new LoadStrategy('simpleema').loadStrategy();
     }
 
-    getDex(){
+    setDex(){
         return new LoadExchange(this.dex).swapClient();
     }
 

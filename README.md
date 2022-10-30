@@ -1,7 +1,7 @@
 # CRYPTO TRADING BOT
 ## Introduction
 
-A fully automated cryptocurrency trading bot. The bot tracks cryptocurrency market data from a given source (either from crypto market tracking websites or cetralised exchanges) and make trades by conectig to a range of decentralised exchanges accross different blockchain networks.
+A fully automated cryptocurrency trading bot. The bot tracks cryptocurrency market data from a given source (either from crypto market tracking websites or cetralised exchanges) and make trades by connecting to a range of decentralised exchanges accross different blockchain networks.
 
 So far the bot can only trade on Solana through Raydium and Orca and pull market data from FTX, however, as the project develops a wider range of networks will be made available such as Ethereum through Uniswap and BSC through Pancakeswap and a wider range of data sources will be added such as Binance, Coingeko and Coinmarketcap.
 

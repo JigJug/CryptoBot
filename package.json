@@ -1,5 +1,5 @@
 {
-  "name": "datacollector",
+  "name": "cryptobot",
   "version": "0.0.1",
   "description": "Collects and stores crypto market data",
   "main": "index.js",
