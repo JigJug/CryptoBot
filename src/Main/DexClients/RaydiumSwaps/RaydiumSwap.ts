@@ -19,13 +19,11 @@ export function raydiumApiSwap(ammount: number, side: string, secretKey: number[
             const skBuffer = Buffer.from(secretKey);
             const ownerKeypair = Keypair.fromSecretKey(skBuffer);
             const owner = ownerKeypair.publicKey;
-
-            const pool = "6UmmUiYoBjSrhakAobJw8BvkmJtDVxaeBtbt7rxWo1mg"
             
             try {
                 const tokenAccounts = await getTokenAccountsByOwner(connection, owner);
                 console.log('connected token account')
-                const poolKeys = await fetchPoolKeys(connection, new PublicKey(pool));
+                const poolKeys = await fetchPoolKeys(connection, new PublicKey(fromRaydiumPools));
                 console.log(`fetched pool keys: ${poolKeys}`)
                 console.log(poolKeys.marketBids)
                 

@@ -1,4 +1,3 @@
-import { Enum } from "@solana/web3.js";
 
 export enum testEnum {
     coin1 = 'hello1',
@@ -97,4 +96,15 @@ export interface XY{
 //console.log('hello3')
 
 
-console.log(getPoolKey('coi/n3'))
+//console.log(getPoolKey('coi/n3'))
+let w = ''
+const dt = () => {console.log('1')}
+const go = () => {
+    if(w=='g'){
+        return dt();
+    }else{
+        return ()=>{console.log(2)}
+        
+    }
+}
+go();

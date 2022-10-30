@@ -18,9 +18,9 @@ export class LoadExchange{
             return this.getRaydium();
         }
         else{
-            return () => {
-                return new Promise((reject)=>{
-                    reject(new Error('can not load exchange'))
+            return (ammount: number, side: string, secretKey: number[], pairing: string) => {
+                return new Promise((resolve, reject)=>{
+                    reject(new Error('can not load exchange: check the bot configs'))
                 })
             }
         }
