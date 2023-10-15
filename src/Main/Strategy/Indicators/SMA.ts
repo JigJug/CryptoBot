@@ -1,4 +1,4 @@
-import { MarketDataObject } from "../../typings"
+import { MarketDataObject } from "../../../typings"
 
 export class SMA{
 

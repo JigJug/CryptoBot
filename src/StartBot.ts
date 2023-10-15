@@ -1,5 +1,7 @@
-import { LoadBot } from "./LoadCryptoBot";
+import loadBot from "./LoadCryptoBot";
 
-export function startBot(){
-    return new LoadBot()
+function startBot(){
+    return loadBot();
 }
+
+export default startBot

@@ -1,15 +1,13 @@
 import { LoadExchange } from './DexClients/ExchangeLoader'
 import { getBalance } from './Utils/CheckWalletBalances'
-import { indicators, MarketDataObject, SecretKeyObj, SingleMarketObject } from './typings'
+import { indicators, MarketDataObject, SecretKeyObj, SingleMarketObject } from '../typings'
 import { LoadStrategy } from './Strategy/LoadStrategy'
 import { FtxClient } from './DataClients/FtxClient'
 import { EventEmitter } from 'events';
 import { MarketDataGrabber } from './MarketDataGrabber'
 import * as fs from 'fs'
 
-
-
-export class CryptoTradingBot {
+class CryptoTradingBot {
     pairing
     windowResolution
     marketData
@@ -252,3 +250,5 @@ export class CryptoTradingBot {
     }
 
 }
+
+export default CryptoTradingBot

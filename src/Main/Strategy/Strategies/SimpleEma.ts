@@ -1,4 +1,4 @@
-import { indicators, MarketDataObject, SingleMarketObject } from "../../typings"
+import { indicators, MarketDataObject, SingleMarketObject } from "../../../typings"
 import { EMA } from "../Indicators/EMA"
 
 export class SimpleEmaStrategy{
