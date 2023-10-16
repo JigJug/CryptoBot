@@ -42,6 +42,7 @@ class CryptoTradingBot {
         this.pairing = pairing
         this.windowResolution = windowResolution
         this.marketData = marketData
+        console.log(this.marketData)
         this.secretkeyPath = secretkeyPath
         this.price = price
         this.dex = dex
@@ -81,9 +82,9 @@ class CryptoTradingBot {
 
     getPrice(){
         this.marketDataGrabber.sendSingleMarketData();
-        this.events.on('SingleMarketData', (SingleMarketData: SingleMarketObject) => {
-            this.price = SingleMarketData.price;
-            this.strategy.buySellLogic(SingleMarketData, this.indicators ,this.sold, this.bought, this.buySellTrigger);
+        this.events.on('SingleMarketData', (SingleMarketData: MarketDataObject) => {//SingleMarketObject) => {
+            this.price = SingleMarketData.close//SingleMarketData.price;
+            this.strategy.buySellLogic(this.price, this.indicators ,this.sold, this.bought, this.buySellTrigger);
         })
 
     }
@@ -104,6 +105,7 @@ class CryptoTradingBot {
         this.marketDataGrabber.sendTimeFrameData(lastTime);
 
         this.events.on('TimeFrameData', (md: MarketDataObject) => {
+            console.log(md)
             this.updateIndicators(md);
             this.updateMarketData(md);
             console.log('updated market data: \n' + this.marketData.time + '\n');

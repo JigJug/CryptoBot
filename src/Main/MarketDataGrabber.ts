@@ -1,5 +1,6 @@
 import EventEmitter from "events";
 import { FtxClient } from "./DataClients/FtxClient";
+import binanceGetHistoricMarketData from "../historicmarketdata/binancegethistoricdata";
 
 export class MarketDataGrabber {
 
@@ -15,8 +16,9 @@ export class MarketDataGrabber {
 
         const fetchSingleMarketData = async () => {
             try{
-                const singleMArketData = await this.client.ftxGetMarket(false, this.client.priceEndpoint);
-                this.eventEmitter.emit('SingleMarketData', singleMArketData.result);
+                //const singleMArketData = await this.client.ftxGetMarket(false, this.client.priceEndpoint);
+                const singleMArketData = await binanceGetHistoricMarketData({limit: '1'})
+                this.eventEmitter.emit('SingleMarketData', singleMArketData);
             }
             catch(err){
                 console.log(err);

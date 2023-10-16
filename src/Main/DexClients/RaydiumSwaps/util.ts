@@ -1,6 +1,6 @@
 import { Connection, Keypair, PublicKey, sendAndConfirmTransaction, Signer, SystemProgram, Transaction, TransactionInstruction,} from "@solana/web3.js";
-import { Token as SplToken, } from "@solana/spl-token"
-import { OpenOrders } from "@project-serum/serum"
+//import { Token as SplToken, } from "@solana/spl-token"
+//import { OpenOrders } from "@project-serum/serum"
 import { TOKEN_PROGRAM_ID, SPL_ACCOUNT_LAYOUT,  TokenAccount, LiquidityPoolKeys, Liquidity, Route, Trade, TokenAmount, Token, Percent, Currency, LIQUIDITY_STATE_LAYOUT_V4 } from "@raydium-io/raydium-sdk";
 
 export async function getTokenAccountsByOwner(
@@ -28,7 +28,7 @@ export async function getTokenAccountsByOwner(
 
 const WSOL_MINT = new PublicKey("So11111111111111111111111111111111111111112")
 
-export async function createWsol(connection: Connection, ownerKeypair: Keypair, amount: number){
+/*export async function createWsol(connection: Connection, ownerKeypair: Keypair, amount: number){
    
   const newAccount = Keypair.generate()
   const newAccountPubkey = newAccount.publicKey
@@ -386,4 +386,4 @@ export async function getLiquidityInfo(connection: Connection, poolId:PublicKey,
     quotePnl,
     priceInQuote
   }
-}
+}*/

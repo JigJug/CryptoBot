@@ -14,9 +14,8 @@ export class SimpleEmaStrategy{
     }
 
 
-    buySellLogic(singleMArketData: SingleMarketObject, indicators: indicators, sold: boolean, bought: boolean, buySellTrigger: boolean){
+    buySellLogic(price: number, indicators: indicators, sold: boolean, bought: boolean, buySellTrigger: boolean){
         //make stoploss a % below the ema. defined in config
-        let price = singleMArketData.price;
         let ema = indicators.ema;
         let stopLossDelta = ema * this.stopLoss;
         let stopPrice = ema - stopLossDelta;

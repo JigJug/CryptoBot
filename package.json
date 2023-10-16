@@ -19,6 +19,7 @@
   "homepage": "https://github.com/JigJug/CryptoProject#readme",
   "devDependencies": {
     "@cowprotocol/cow-sdk": "^3.0.0",
+    "@raydium-io/raydium-sdk": "^0.0.1",
     "@types/node": "^20.8.6",
     "typescript": "^4.2.3"
   },

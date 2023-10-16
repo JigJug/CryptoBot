@@ -1,6 +1,6 @@
-import { StoreDataJson } from '../Main/Utils/StoreDataToJson';
-import {EMA} from '../Main/Strategy/Indicators/EMA';
-import { SMA } from '../Main/Strategy/Indicators/SMA';
+import { StoreDataJson } from './StoreDataToJson';
+import {EMA} from '../Strategy/Indicators/EMA';
+import { SMA } from '../Strategy/Indicators/SMA';
 
 function calcEmaStoreData(data:any, emaPeriod: number, pairing1: string, windowResolution: string) {
 

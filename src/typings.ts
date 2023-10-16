@@ -23,7 +23,7 @@ export interface BotConfig {
     cexData: string;
     dex: string;
     stopLoss: number
-    data: null | MarketDataObject[]
+    data: null | MarketDataObject
 }
 
 export interface HistoricData {
@@ -74,4 +74,8 @@ export interface CexClient {
 
 export interface PoolList {
     
+}
+
+export interface EndPointOptions {
+
 }

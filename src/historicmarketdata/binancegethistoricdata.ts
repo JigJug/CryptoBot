@@ -1,32 +1,41 @@
 import { HttpsGetRequest } from "../Main/Utils/HttpsGetRequest";
-import { BotConfig } from "../typings";
+import { BotConfig, MarketDataObject } from "../typings";
+import calcEmaStoreData from "../Main/Utils/calcema";
 
-function mapBinanceCandleData(data: any) {
+function mapBinanceCandleData(data: any): MarketDataObject[] {
     return data.map((v : any) => {
         return {
             stratTime: v[0],
             time: v[6],
-            open: v[1],
-            high: v[2],
-            low: v[3],
-            close: v[4],
-            volume: v[5],
+            open: parseFloat(v[1]),
+            high: parseFloat(v[2]),
+            low: parseFloat(v[3]),
+            close: parseFloat(v[4]),
+            volume: parseFloat(v[5]),
         }
     })
 }
 
-async function binanceGetHistoricMarketData(botConfig: BotConfig) {
+async function binanceGetHistoricMarketData(options?: {limit: string}) {
+
+    const limit = (() => {
+        return options? `&limit=${options.limit}` : '';
+    })();
+
     const baseUrl = 'https://api.binance.com/api/v3/';
-    const endPointCd = 'klines?symbol=SOLUSDT&interval=4h&limit=2';
-    const endPointPing = 'ping'
-    const t = 'time'
+    const endPointCd = 'klines?symbol=SOLUSDT&interval=4h';//&limit=20';
+
     const req = new HttpsGetRequest();
-    const historicCandleData = await req.httpsGet(`${baseUrl}${endPointCd}`);
+
+    const historicCandleData = await req.httpsGet(`${baseUrl}${endPointCd}${limit}`);
+
     const data = mapBinanceCandleData(JSON.parse(historicCandleData));
-    
-    return botConfig
+    if(options)const dataWithEma: MarketDataObject[] = await calcEmaStoreData(data, 70, 'SOLUSDT', '300');
+    const md = dataWithEma.reverse();
+
+    return options? md[0] : md[1]
+
 }
 
-binanceGetHistoricMarketData({})
 
 export default binanceGetHistoricMarketData

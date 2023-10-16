@@ -12,31 +12,30 @@ function getBotConfigs(): BotConfig {
 async function loadBot() {
     try {
 
-        const botConfig = getBotConfigs();
+        let botConfig = getBotConfigs();
 
-        const rt = await getHistoricMarketData(botConfig);
+        botConfig.data = await getHistoricMarketData(botConfig);
 
-        if(rt.data == null) throw new Error('can not get market data');
+        if(botConfig.data == null) throw new Error('can not get market data');
 
-        let marketData = rt.data[rt.data.length - 1]
-        console.log(rt.pairing, rt.windowResolution, marketData)
+        console.log(botConfig.pairing, botConfig.windowResolution, botConfig.data)
         console.log('start new bot instance')
 
         const indicators: indicators = {
-            ema: marketData.ema,
+            ema: botConfig.data.ema,
             rsi: 0,
             macd: 0,
             sma: 0
         }
 
         const NewBot = new CryptoTradingBot(
-            rt.pairing,
-            rt.windowResolution,
-            marketData,
-            rt.secretKeyPath,
-            marketData.close,
-            rt.dex,
-            rt.stopLoss,
+            botConfig.pairing,
+            botConfig.windowResolution,
+            botConfig.data,
+            botConfig.secretKeyPath,
+            botConfig.data.close,
+            botConfig.dex,
+            botConfig.stopLoss,
             indicators
         )
         
