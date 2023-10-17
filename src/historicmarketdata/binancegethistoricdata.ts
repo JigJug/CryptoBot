@@ -1,6 +1,6 @@
 import { HttpsGetRequest } from "../Main/Utils/HttpsGetRequest";
 import { BotConfig, MarketDataObject } from "../typings";
-import calcEmaStoreData from "../Main/Utils/calcema";
+import calcEmaStoreData from "../Main/DataClients/handlers/calcema";
 
 function mapBinanceCandleData(data: any): MarketDataObject[] {
     return data.map((v : any) => {

@@ -1,28 +1,25 @@
-import { BaseClient } from "../Utils/baseclient";
+
 import { MarketDataObject } from "../../typings";
 import { FtxClient } from "./FtxClient";
-import calcEmaStoreData from "../Utils/calcema";
+import calcEmaStoreData from "./handlers/calcema";
 
 function mapBinanceCandleData(data: any): MarketDataObject[] {
-    return data.map((v : any) => {
-        return {
-            stratTime: v[0],
-            time: v[6],
-            open: parseFloat(v[1]),
-            high: parseFloat(v[2]),
-            low: parseFloat(v[3]),
-            close: parseFloat(v[4]),
-            volume: parseFloat(v[5]),
-        }
-    })
+  return data.map((v : any) => {
+    return {
+      stratTime: v[0],
+      time: v[6],
+      open: parseFloat(v[1]),
+      high: parseFloat(v[2]),
+      low: parseFloat(v[3]),
+      close: parseFloat(v[4]),
+      volume: parseFloat(v[5]),
+    }
+  })
 }
 
 
 
-interface ClientConfigs {
-  symbol: string,
-  interval: '15m' | '1h' | '4h' | '1D',
-}
+
 
 class BinanceClient extends BaseClient{
 

@@ -1,4 +1,4 @@
-import { getHistoricMarketData } from "./historicmarketdata";
+import { Client } from "./Main/DataClients/dataclient";
 import {CryptoTradingBot} from "./Main/index";
 import { BotConfig, indicators } from "./typings";
 import * as fs from 'fs';
@@ -12,9 +12,13 @@ function getBotConfigs(): BotConfig {
 async function loadBot() {
     try {
 
-        let botConfig = getBotConfigs();
+        const botConfig = getBotConfigs();
 
-        botConfig.data = await getHistoricMarketData(botConfig);
+        const client = new Client().getClient(botConfig);
+
+        botConfig.data = await client.historicMarketData();
+
+        console.log(botConfig.data);
 
         if(botConfig.data == null) throw new Error('can not get market data');
 
@@ -28,18 +32,13 @@ async function loadBot() {
             sma: 0
         }
 
-        const NewBot = new CryptoTradingBot(
-            botConfig.pairing,
-            botConfig.windowResolution,
-            botConfig.data,
-            botConfig.secretKeyPath,
-            botConfig.data.close,
-            botConfig.dex,
-            botConfig.stopLoss,
-            indicators
+        const newBot = new CryptoTradingBot(
+            botConfig,
+            indicators,
+            client
         )
         
-        NewBot.startBot();
+        newBot.startBot();
 
         console.log('bot started');
 

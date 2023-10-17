@@ -1,6 +1,6 @@
 import { FtxClient } from '../Main/DataClients/FtxClient'
 import { BotConfig, MarketDataObject} from '../typings';
-import calcEmaStoreData from '../Main/Utils/calcema';
+import calcEmaStoreData from '../Main/DataClients/handlers/calcema';
 
 export async function FtxGetHistoricMarketData(botConfig: BotConfig){
     let pairing1: string = botConfig.pairing.replace('/', '')

@@ -1,6 +1,6 @@
-import { StoreDataJson } from './StoreDataToJson';
-import {EMA} from '../Strategy/Indicators/EMA';
-import { SMA } from '../Strategy/Indicators/SMA';
+import { StoreDataJson } from '../../Utils/StoreDataToJson';
+import {EMA} from '../../Strategy/Indicators/EMA';
+import { SMA } from '../../Strategy/Indicators/SMA';
 
 function calcEmaStoreData(data:any, emaPeriod: number, pairing1: string, windowResolution: string) {
 
@@ -26,7 +26,7 @@ function calcEmaStoreData(data:any, emaPeriod: number, pairing1: string, windowR
         let addedEma = data.map(calcEma);
     
         //send store data to json (filename: coin + time)
-        let newJson = new StoreDataJson('D:\\CryptoProject\\CryptoBot\\MarketData\\',pairing1, windowResolution);
+        let newJson = new StoreDataJson('D:\\CryptoProject\\CryptoBot\\MarketData\\',pairing1.replace('/', ''), windowResolution);
         newJson.storeToJson(addedEma).then(() => {
             resolve(addedEma);
         })

@@ -79,3 +79,15 @@ export interface PoolList {
 export interface EndPointOptions {
 
 }
+
+export interface DataClientHandler {
+    processHistoricData: (
+      config: BotConfig,
+    ) => Promise<MarketDataObject>;
+    processPrice: () => Promise<number>;
+}
+
+export interface Endpoints {
+    price: string;
+    candleData: string;
+}

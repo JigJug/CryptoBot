@@ -8,9 +8,11 @@ export function orcaApiSwap(ammount: number, side: string, secretKey: number[], 
 
         const swap = async () => {
 
+            console.log('swapping orca')
             //Get the orca pool from pairing
-            let orcaPairing: string = pairing.replace('/', '_')
-            const fromOrcaPoolConfig = OrcaPoolConfig[`${orcaPairing}C` as keyof typeof OrcaPoolConfig]
+            let orcaPairing1: string = pairing.replace('/', '_')
+            let orcaPairing: string = pairing.replace('T', 'C')
+            const fromOrcaPoolConfig = OrcaPoolConfig[`${orcaPairing}` as keyof typeof OrcaPoolConfig]
 
             //Read secret key file to get owner keypair
             const unit8Sk = Uint8Array.from(secretKey);

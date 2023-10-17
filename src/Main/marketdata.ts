@@ -1,24 +1,22 @@
 import EventEmitter from "events";
-import { FtxClient } from "./DataClients/FtxClient";
-import binanceGetHistoricMarketData from "../historicmarketdata/binancegethistoricdata";
+import { DataClient } from "./DataClients/dataclient";
 
 export class MarketDataGrabber {
 
     client
     eventEmitter
 
-    constructor(client: FtxClient, eventEmitter: EventEmitter){
+    constructor(client: DataClient, eventEmitter: EventEmitter){
         this.client = client,
         this.eventEmitter = eventEmitter
     }
 
-    sendSingleMarketData(){
+    sendPrice(){
 
-        const fetchSingleMarketData = async () => {
+        const fetcPrice = async () => {
             try{
-                //const singleMArketData = await this.client.ftxGetMarket(false, this.client.priceEndpoint);
-                const singleMArketData = await binanceGetHistoricMarketData({limit: '1'})
-                this.eventEmitter.emit('SingleMarketData', singleMArketData);
+                const price = await this.client.getPrice();
+                this.eventEmitter.emit('SingleMarketData', price);
             }
             catch(err){
                 console.log(err);
@@ -26,7 +24,7 @@ export class MarketDataGrabber {
         }
         
         setInterval(() => {
-            fetchSingleMarketData();
+            fetcPrice();
         },5000)
     }
 
@@ -34,13 +32,13 @@ export class MarketDataGrabber {
     
     sendTimeFrameData(lastTime: number){
 
-        let TimeFrame: number = 1000 * parseInt(this.client.windowResolution);
+        let TimeFrame: number = 1000 * parseInt(this.client.config.windowResolution);
         let timeMills: number
         let timeDiff: number
         
         const routineData = async () => {
             try {
-                const getMarketData = await this.client.ftxGetMarket(true, this.client.marketDataEndPoint);
+                const getMarketData = await this.client.historicMarketData();
                 this.eventEmitter.emit('TimeFrameData', getMarketData);
             }
             catch(err){

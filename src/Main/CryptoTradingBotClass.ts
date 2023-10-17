@@ -1,11 +1,12 @@
 import { LoadExchange } from './DexClients/ExchangeLoader'
 import { getBalance } from './Utils/CheckWalletBalances'
-import { indicators, MarketDataObject, SecretKeyObj, SingleMarketObject } from '../typings'
+import { BotConfig, indicators, MarketDataObject, SecretKeyObj, SingleMarketObject } from '../typings'
 import { LoadStrategy } from './Strategy/LoadStrategy'
 import { FtxClient } from './DataClients/FtxClient'
 import { EventEmitter } from 'events';
-import { MarketDataGrabber } from './MarketDataGrabber'
+import { MarketDataGrabber } from './marketdata'
 import * as fs from 'fs'
+import { DataClient } from './DataClients/dataclient'
 
 class CryptoTradingBot {
     pairing
@@ -30,23 +31,17 @@ class CryptoTradingBot {
     strategy
     
     constructor(
-        pairing: string,
-        windowResolution: string,
-        marketData: MarketDataObject,
-        secretkeyPath: string,
-        price: number,
-        dex: string,
-        stopLoss: number,
-        indicators: indicators
+        botConfig: BotConfig,
+        indicators: indicators,
+        dataClient: DataClient
     ){
-        this.pairing = pairing
-        this.windowResolution = windowResolution
-        this.marketData = marketData
-        console.log(this.marketData)
-        this.secretkeyPath = secretkeyPath
-        this.price = price
-        this.dex = dex
-        this.stopLoss = stopLoss
+        this.pairing = botConfig.pairing
+        this.windowResolution = botConfig.windowResolution
+        this.marketData = botConfig.data
+        this.secretkeyPath = botConfig.secretKeyPath
+        this.price = botConfig.data?.close
+        this.dex = botConfig.dex
+        this.stopLoss = botConfig.stopLoss
         this.indicators = indicators
         
         this.buySellTrigger = true
@@ -55,7 +50,7 @@ class CryptoTradingBot {
         this.coin = 'RAY'
         //load the data and dex clients, emitters, secretkey and strategy
         this.events = this.setEventEmitter();
-        this.dataClient = this.setDataClient();
+        this.dataClient = dataClient;
         this.marketDataGrabber = this.setMarketDataGrabber();
         this.dexClient = this.setDex();
         this.secretKey = this.setSecretKey();
@@ -81,10 +76,11 @@ class CryptoTradingBot {
     }
 
     getPrice(){
-        this.marketDataGrabber.sendSingleMarketData();
-        this.events.on('SingleMarketData', (SingleMarketData: MarketDataObject) => {//SingleMarketObject) => {
-            this.price = SingleMarketData.close//SingleMarketData.price;
-            this.strategy.buySellLogic(this.price, this.indicators ,this.sold, this.bought, this.buySellTrigger);
+        this.marketDataGrabber.sendPrice();
+        this.events.on('SingleMarketData', (price: number) => {//SingleMarketObject) => {
+            console.log(price)
+            this.price = price;
+            this.strategy.buySellLogic(price, this.indicators ,this.sold, this.bought, this.buySellTrigger);
         })
 
     }
@@ -100,15 +96,15 @@ class CryptoTradingBot {
     }
 
     getTimeFrameData(){
-        let lastTime = this.marketData.time;
+        let lastTime = this.marketData?.time;
 
-        this.marketDataGrabber.sendTimeFrameData(lastTime);
+        this.marketDataGrabber.sendTimeFrameData(lastTime!);
 
         this.events.on('TimeFrameData', (md: MarketDataObject) => {
             console.log(md)
             this.updateIndicators(md);
             this.updateMarketData(md);
-            console.log('updated market data: \n' + this.marketData.time + '\n');
+            console.log('updated market data: \n' + this.marketData?.time + '\n');
             console.log('ema:: ',  this.indicators.ema);
         })
 
@@ -142,6 +138,7 @@ class CryptoTradingBot {
     }
     
     buy(side: string){
+        console.log('buy signal')
         this.buySellTrigger = false;
         getBalance('USD')
         .then((bal) =>{
@@ -187,9 +184,9 @@ class CryptoTradingBot {
     botStatusUpdate(){
         setInterval(()=>{
             console.log(
-                `lastdatatime: ${this.marketData.startTime}\n
+                `lastdatatime: ${this.marketData?.startTime}\n
                 price: ${this.price}\n
-                volume: ${this.marketData.volume}\n
+                volume: ${this.marketData?.volume}\n
                 bought: ${this.bought}\n
                 sold: ${this.sold}\n
                 buyselltrigger : ${this.buySellTrigger}`
@@ -201,13 +198,13 @@ class CryptoTradingBot {
 
     updateMarketData(md: MarketDataObject){
         console.log('updating market data' );
-        this.marketData.startTime = md.startTime;
-        this.marketData.time = md.time;
-        this.marketData.open = md.open;
-        this.marketData.high = md.high;
-        this.marketData.low = md.low;
-        this.marketData.close = md.close;
-        this.marketData.volume = md.volume;
+        this.marketData!.startTime = md.startTime;
+        this.marketData!.time = md.time;
+        this.marketData!.open = md.open;
+        this.marketData!.high = md.high;
+        this.marketData!.low = md.low;
+        this.marketData!.close = md.close;
+        this.marketData!.volume = md.volume;
     }
 
     updateIndicators(md: MarketDataObject){
