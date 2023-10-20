@@ -1,13 +1,13 @@
 import { BotConfig, DataClientHandler } from "../../typings";
 import { endpoints } from "./endpoints";
-import { BinanceHandler } from "./handlers/binancehandler";
+import { BinanceClient } from "./handlers/binancehandler";
 
 
 class GetDataClientHandler {
   getDch(config: BotConfig){
     const eps = endpoints(config);
     const cdh: Record<string, () => DataClientHandler>  = {
-      binance: () => new BinanceHandler(eps),
+      binance: () => new BinanceClient(eps),
     }
     return cdh[config.cexData]();
   }

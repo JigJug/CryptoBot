@@ -2,7 +2,7 @@ import { BotConfig, DataClientHandler, Endpoints, MarketDataObject } from "../..
 import { BaseClient } from "../baseclient";
 import calcEmaStoreData from "./calcema";
 
-export class BinanceHandler extends BaseClient implements DataClientHandler {
+export class BinanceClient extends BaseClient implements DataClientHandler {
 
     constructor(endpoints: Endpoints) {
       super(endpoints)

@@ -8,10 +8,10 @@ export function orcaApiSwap(ammount: number, side: string, secretKey: number[], 
 
         const swap = async () => {
 
-            console.log('swapping orca')
+            console.log('swapping through orca dex')
             //Get the orca pool from pairing
             let orcaPairing1: string = pairing.replace('/', '_')
-            let orcaPairing: string = pairing.replace('T', 'C')
+            let orcaPairing: string = orcaPairing1.replace('T', 'C')
             const fromOrcaPoolConfig = OrcaPoolConfig[`${orcaPairing}` as keyof typeof OrcaPoolConfig]
 
             //Read secret key file to get owner keypair
@@ -26,12 +26,8 @@ export function orcaApiSwap(ammount: number, side: string, secretKey: number[], 
                 const orcaPool = orca.getPool(fromOrcaPoolConfig); // get the liquidity pool key
 
                 const orcaToken = (side: string):OrcaPoolToken => {
-                    if(side =='sell'){
-                        return orcaPool.getTokenA(); //token A from first token
-                    }
-                    else {
-                        return orcaPool.getTokenB(); //token B from second token
-                    }
+                    if(side =='sell') return orcaPool.getTokenA(); //token A from first token
+                    else return orcaPool.getTokenB(); //token B from second token
                 }
 
                 const orcaAmount = new Decimal(ammount);
@@ -39,7 +35,7 @@ export function orcaApiSwap(ammount: number, side: string, secretKey: number[], 
                 const quote = await orcaPool.getQuote(orcaToken(side), orcaAmount, slippage);
                 const usdcAmount = quote.getMinOutputAmount();
           
-                console.log(`Swap ${orcaAmount.toString()} ${side} for at least ${usdcAmount.toNumber()} `);
+                console.log(`Swap ${orcaAmount.toString()} ${orcaPool.getTokenA().name} for at least ${usdcAmount.toNumber()} usdc (${side})`);
                 const swapPayload = await orcaPool.swap(owner, orcaToken(side), orcaAmount, usdcAmount);
                 const swapTxId = await swapPayload.execute();
                 console.log("Swapped:", swapTxId, "\n");
