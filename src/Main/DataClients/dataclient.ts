@@ -1,9 +1,9 @@
 import { BotConfig, DataClientHandler } from "../../typings";
 import { endpoints } from "./endpoints";
-import { BinanceClient } from "./handlers/binancehandler";
+import { BinanceClient } from "./clients/binanceclient";
 
 
-class GetDataClientHandler {
+class GetDataClient {
   getDch(config: BotConfig){
     const eps = endpoints(config);
     const cdh: Record<string, () => DataClientHandler>  = {
@@ -39,7 +39,7 @@ export class DataClient {
 export class Client {
   getClient(config: BotConfig){
     return new DataClient(
-      new GetDataClientHandler().getDch(config),
+      new GetDataClient().getDch(config),
       config
     );
   }

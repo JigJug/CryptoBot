@@ -2,7 +2,7 @@ import { LoadExchange } from './DexClients/ExchangeLoader'
 import { getBalance } from './Utils/CheckWalletBalances'
 import { BotConfig, indicators, MarketDataObject, SecretKeyObj, SingleMarketObject } from '../typings'
 import { LoadStrategy } from './Strategy/LoadStrategy'
-import { FtxClient } from './DataClients/FtxClient'
+import { FtxClient } from './DataClients/clients/FtxClient'
 import { EventEmitter } from 'events';
 import { MarketDataGrabber } from './marketdata'
 import * as fs from 'fs'
@@ -45,8 +45,8 @@ class CryptoTradingBot {
         this.indicators = indicators
         
         this.buySellTrigger = true
-        this.bought = false
-        this.sold = true
+        this.bought = true
+        this.sold = false
         this.coin = 'RAY'
         //load the data and dex clients, emitters, secretkey and strategy
         this.events = this.setEventEmitter();
@@ -78,7 +78,7 @@ class CryptoTradingBot {
     getPrice(){
         this.marketDataGrabber.sendPrice();
         this.events.on('SingleMarketData', (price: number) => {//SingleMarketObject) => {
-            console.log(price)
+            //console.log(price)
             this.price = price;
             this.strategy.buySellLogic(price, this.indicators ,this.sold, this.bought, this.buySellTrigger);
         })

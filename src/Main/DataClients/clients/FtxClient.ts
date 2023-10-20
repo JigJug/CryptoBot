@@ -1,4 +1,4 @@
-import { HttpsGetRequest } from "../Utils/HttpsGetRequest";
+import { HttpsGetRequest } from "../../Utils/HttpsGetRequest";
 
 export class FtxClient {
 

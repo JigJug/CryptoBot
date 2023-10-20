@@ -16,7 +16,7 @@ export class BinanceClient extends BaseClient implements DataClientHandler {
       console.log('mapping data')
       return data.map((v : any) => {
         return {
-          stratTime: v[0],
+          startTime: v[0],
           time: v[6],
           open: parseFloat(v[1]),
           high: parseFloat(v[2]),
@@ -31,9 +31,8 @@ export class BinanceClient extends BaseClient implements DataClientHandler {
       const historicCandleData = await this.candleData();
       console.log(this.endpoints.candleData)
       const data = mapBinanceCandleData(JSON.parse(historicCandleData));
-      const dataWithEma: MarketDataObject[] = await calcEmaStoreData(data, parseInt(config.emaInterval), config.pairing, '300');
+      const dataWithEma = await calcEmaStoreData(data, parseInt(config.emaInterval), config.pairing, '300');
       const md = dataWithEma.reverse();
-      console.log('finished data')
       return md[1]
     } catch (err) {
       throw err;
@@ -43,7 +42,6 @@ export class BinanceClient extends BaseClient implements DataClientHandler {
   async processPrice() {
     try {
       const priceRet = await this.price();
-      console.log(priceRet)
       return parseFloat(JSON.parse(priceRet).price);
     } catch (err) {
       throw err

@@ -32,7 +32,7 @@ export class MarketDataGrabber {
     
     sendTimeFrameData(lastTime: number){
 
-        let TimeFrame: number = 1000 * parseInt(this.client.config.windowResolution);
+        let TimeFrame: number = 1000 * 14400//need something to convert numbers to binance naming eg 300 = 4h //parseInt(this.client.config.windowResolution);
         let timeMills: number
         let timeDiff: number
         
@@ -50,6 +50,7 @@ export class MarketDataGrabber {
         setInterval(() => {
             timeMills = new Date().getTime();
             timeDiff = timeMills - lastTime
+            //console.log(timeMills, timeDiff, TimeFrame)
             if(timeDiff > TimeFrame){
                 lastTime = lastTime + TimeFrame
                 routineData();
