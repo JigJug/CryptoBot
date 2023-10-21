@@ -47,7 +47,7 @@ class CryptoTradingBot {
         this.buySellTrigger = true
         this.bought = true
         this.sold = false
-        this.coin = 'RAY'
+        this.coin = 'SOL'
         //load the data and dex clients, emitters, secretkey and strategy
         this.events = this.setEventEmitter();
         this.dataClient = dataClient;

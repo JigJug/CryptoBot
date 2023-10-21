@@ -44,7 +44,7 @@ async function startBot() {
         console.log('bot started');
 
     } catch (err) {
-        throw err;
+        console.error(err)
     }
 }
 
