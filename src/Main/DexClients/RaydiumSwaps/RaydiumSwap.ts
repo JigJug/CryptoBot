@@ -6,7 +6,7 @@ import { RaydiumPools } from "./RaydiumPools";
 
 
 
-export function raydiumApiSwap(ammount: number, side: string, secretKey: number[], pairing: string){
+export function raydiumApiSwap(ammount: number, side: string, secretKey: Uint8Array |null, pairing: string){
     return new Promise<void>((resolve, reject) => {
 
         const swap = async () => {
@@ -16,7 +16,7 @@ export function raydiumApiSwap(ammount: number, side: string, secretKey: number[
             console.log(`fetched pool key ${raydiumPairing}: ${fromRaydiumPools}`);
 
             const connection = new Connection("https://solana-api.projectserum.com", "confirmed");
-            const skBuffer = Buffer.from(secretKey);
+            const skBuffer = Buffer.from(secretKey!);
             const ownerKeypair = Keypair.fromSecretKey(skBuffer);
             const owner = ownerKeypair.publicKey;
             

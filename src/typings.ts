@@ -18,7 +18,6 @@ export interface MarketDataObject {
 export interface BotConfig {
     pairing: string;
     windowResolution: string;
-    secretKeyPath: string;
     emaInterval: string;
     cexData: string;
     dex: string;

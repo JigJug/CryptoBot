@@ -5,10 +5,14 @@ export class MarketDataGrabber {
 
     client
     eventEmitter
+    id
+    pubkey
 
-    constructor(client: DataClient, eventEmitter: EventEmitter){
-        this.client = client,
+    constructor(client: DataClient, eventEmitter: EventEmitter, id: string, pubkey: string){
+        this.client = client
         this.eventEmitter = eventEmitter
+        this.id = id
+        this.pubkey = pubkey
     }
 
     sendPrice(){
@@ -16,7 +20,7 @@ export class MarketDataGrabber {
         const fetcPrice = async () => {
             try{
                 const price = await this.client.getPrice();
-                this.eventEmitter.emit('SingleMarketData', price);
+                this.eventEmitter.emit('SingleMarketData', price, this.id, this.pubkey);
             }
             catch(err){
                 console.log(err);
@@ -39,7 +43,7 @@ export class MarketDataGrabber {
         const routineData = async () => {
             try {
                 const getMarketData = await this.client.historicMarketData();
-                this.eventEmitter.emit('TimeFrameData', getMarketData);
+                this.eventEmitter.emit('TimeFrameData', getMarketData, this.id,this.pubkey);
             }
             catch(err){
                 console.log(err)

@@ -1,19 +1,11 @@
+import EventEmitter from "events";
 import { Client } from "./Main/DataClients/dataclient";
 import {CryptoTradingBot} from "./Main/index";
 import { BotConfig, indicators } from "./typings";
-import * as fs from 'fs';
+import { createWallet } from "./Main/createwallet/createwallet";
 
-function getBotConfigs(): BotConfig {
-    let configPAth = 'D:\\CryptoProject\\BotConfigs\\config.json'
-    let botConfigRaw = fs.readFileSync(configPAth, "utf8");
-    return JSON.parse(botConfigRaw);
-}
-
-async function startBot() {
+async function startBot(botConfig: BotConfig, events: EventEmitter, id: string, pubkey: string) {
     try {
-
-        const botConfig = getBotConfigs();
-
         //load in cex data client and get historic candle data to calc indicators
         //pass the client and last candle data to a new bot instance
         const client = new Client().getClient(botConfig);
@@ -33,16 +25,20 @@ async function startBot() {
             sma: 0
         }
 
-        const newBot = new CryptoTradingBot(
+        const keyPair = createWallet();
+        console.log('keypair generated for new bot')
+        console.log(keyPair.publicKey)
+
+        return new CryptoTradingBot(
+            id,
+            pubkey,
             botConfig,
             indicators,
-            client
+            client,
+            events,
+            keyPair
         )
         
-        newBot.startBot();
-
-        console.log('bot started');
-
     } catch (err) {
         console.error(err)
     }

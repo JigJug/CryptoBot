@@ -18,7 +18,7 @@ export class LoadExchange{
             return this.getRaydium();
         }
         else{
-            return (ammount: number, side: string, secretKey: number[], pairing: string) => {
+            return (ammount: number, side: string, secretKey: Uint8Array|null, pairing: string) => {
                 return new Promise((resolve, reject)=>{
                     reject(new Error('can not load exchange: check the bot configs'))
                 })

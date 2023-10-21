@@ -5,14 +5,16 @@ import { LoadStrategy } from './Strategy/LoadStrategy'
 import { FtxClient } from './DataClients/clients/FtxClient'
 import { EventEmitter } from 'events';
 import { MarketDataGrabber } from './marketdata'
-import * as fs from 'fs'
 import { DataClient } from './DataClients/dataclient'
+import { createWallet } from './createwallet/createwallet'
+import { Keypair } from '@solana/web3.js'
 
 class CryptoTradingBot {
+    id
+    pubkey
     pairing
     windowResolution
     marketData
-    secretkeyPath
     price
     dex
     stopLoss
@@ -27,18 +29,25 @@ class CryptoTradingBot {
     dataClient
     marketDataGrabber
     dexClient
-    secretKey
     strategy
+    keyPair: Keypair | null
+    secretKey: Uint8Array |null
+    
     
     constructor(
+        id: string,
+        pubkey: string,
         botConfig: BotConfig,
         indicators: indicators,
-        dataClient: DataClient
+        dataClient: DataClient,
+        events: EventEmitter,
+        keyPair: Keypair,
     ){
+        this.id = id
+        this.pubkey = pubkey
         this.pairing = botConfig.pairing
         this.windowResolution = botConfig.windowResolution
         this.marketData = botConfig.data
-        this.secretkeyPath = botConfig.secretKeyPath
         this.price = botConfig.data?.close
         this.dex = botConfig.dex
         this.stopLoss = botConfig.stopLoss
@@ -49,12 +58,13 @@ class CryptoTradingBot {
         this.sold = false
         this.coin = 'SOL'
         //load the data and dex clients, emitters, secretkey and strategy
-        this.events = this.setEventEmitter();
+        this.events = events;
         this.dataClient = dataClient;
         this.marketDataGrabber = this.setMarketDataGrabber();
         this.dexClient = this.setDex();
-        this.secretKey = this.setSecretKey();
         this.strategy = this.setStrategy();
+        this.keyPair = keyPair
+        this.secretKey = keyPair.secretKey
     }
 
     startBot(){
@@ -65,7 +75,7 @@ class CryptoTradingBot {
         this.setPrice();
         this.setTimeFrameData();
         this.botStatusUpdate();
-        this.buySellListeners();
+        //this.buySellListeners();
     }
 
 
@@ -77,11 +87,11 @@ class CryptoTradingBot {
 
     getPrice(){
         this.marketDataGrabber.sendPrice();
-        this.events.on('SingleMarketData', (price: number) => {//SingleMarketObject) => {
+        //this.events.on('SingleMarketData', (price: number) => {//SingleMarketObject) => {
             //console.log(price)
-            this.price = price;
-            this.strategy.buySellLogic(price, this.indicators ,this.sold, this.bought, this.buySellTrigger);
-        })
+        //    this.price = price;
+        //    this.strategy.buySellLogic(price, this.indicators ,this.sold, this.bought, this.buySellTrigger);
+        //})
 
     }
     testPrice(){
@@ -100,36 +110,36 @@ class CryptoTradingBot {
 
         this.marketDataGrabber.sendTimeFrameData(lastTime!);
 
-        this.events.on('TimeFrameData', (md: MarketDataObject) => {
-            console.log(md)
-            this.updateIndicators(md);
-            this.updateMarketData(md);
-            console.log('updated market data: \n' + this.marketData?.time + '\n');
-            console.log('ema:: ',  this.indicators.ema);
-        })
+        //this.events.on('TimeFrameData', (md: MarketDataObject) => {
+        //    console.log(md)
+        //    this.updateIndicators(md);
+        //    this.updateMarketData(md);
+        //    console.log('updated market data: \n' + this.marketData?.time + '\n');
+        //    console.log('ema:: ',  this.indicators.ema);
+        //})
 
     }
 
 
 
     //buying and selling
-    buySellListeners(){
+    /*buySellListeners(){
 
-        this.events.on('Buy', (buy: boolean) => {
+        this.events.on('Buy', (buy: boolean, id) => {
             console.log('recieved buy signal');
             if(buy && this.buySellTrigger && this.sold){
                 this.getBuy();
             }
         });
 
-        this.events.on('Sell', (sell: boolean) => {
+        this.events.on('Sell', (sell: boolean, id) => {
             console.log('recieved sell signal');
             if(sell && this.buySellTrigger && this.bought){
                 this.getSell();
             }
         })
 
-    }
+    }*/
 
 
 
@@ -213,14 +223,18 @@ class CryptoTradingBot {
 
 
 
-    setSecretKey():number[]{
+    setSecretKey(){
         return this.getSecretKey();
     }
 
-    getSecretKey():number[]{
-        let secretKeyString = fs.readFileSync(this.secretkeyPath, "utf8");
-        const secretKey: SecretKeyObj = JSON.parse(secretKeyString);
-        return secretKey.pk
+    getSecretKey(){
+        //let secretKeyString = fs.readFileSync(this.secretkeyPath, "utf8");
+        //const secretKey: SecretKeyObj = JSON.parse(secretKeyString);
+        //return secretKey.pk
+        this.keyPair = createWallet()
+        console.log('keypair generated for new bot')
+        console.log(this.keyPair.publicKey)
+        this.secretKey = this.keyPair.secretKey
     }
 
     setEventEmitter(){
@@ -232,12 +246,12 @@ class CryptoTradingBot {
     }
 
     setMarketDataGrabber(){
-        return new MarketDataGrabber(this.dataClient, this.events);
+        return new MarketDataGrabber(this.dataClient, this.events, this.id, this.pubkey);
     }
 
     setStrategy(){
         const strategy = this.getStrategy();
-        return new strategy(this.stopLoss, this.events)
+        return new strategy(this.stopLoss, this.events, this.id, this.pubkey)
     }
 
     getStrategy(){

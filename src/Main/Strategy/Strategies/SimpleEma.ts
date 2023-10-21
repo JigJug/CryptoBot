@@ -6,11 +6,15 @@ export class SimpleEmaStrategy{
     stopLoss
     eventEmitter
     ema
+    id
+    pubkey
 
-    constructor(stopLoss: number, eventEmitter: NodeJS.EventEmitter){
+    constructor(stopLoss: number, eventEmitter: NodeJS.EventEmitter, id: string, pubkey: string){
         this.stopLoss = stopLoss
         this.eventEmitter = eventEmitter
         this.ema = new EMA(70);
+        this.id = id;
+        this.pubkey = pubkey
     }
 
 
@@ -23,14 +27,14 @@ export class SimpleEmaStrategy{
         if(buySellTrigger && sold){
             if(price > ema){
                 console.log('buyemitter trigger', price, ema);
-                this.eventEmitter.emit('Buy', true);
+                this.eventEmitter.emit('Buy', true, this.id, this.pubkey);
             }
         }
 
         else if(buySellTrigger && bought){
             if(price < stopPrice){
                 console.log('sellemitter trigger', price, ema);
-                this.eventEmitter.emit('Sell', true);
+                this.eventEmitter.emit('Sell', true, this.id, this.pubkey);
             }
         }
     }
