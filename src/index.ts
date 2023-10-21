@@ -1,5 +1,1 @@
-import startBot from './startbot';
-
-
-
-startBot();
+export {default as startBot} from './startbot';
