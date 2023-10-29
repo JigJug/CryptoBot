@@ -32,6 +32,7 @@ class CryptoTradingBot {
     strategy
     keyPair: Keypair | null
     secretKey: Uint8Array |null
+    secretKeyPath
     
     
     constructor(
@@ -65,6 +66,7 @@ class CryptoTradingBot {
         this.strategy = this.setStrategy();
         this.keyPair = keyPair
         this.secretKey = keyPair.secretKey
+        this.secretKeyPath = ''
     }
 
     startBot(){
@@ -221,7 +223,15 @@ class CryptoTradingBot {
         this.indicators = this.strategy.updateIndicators(md, this.indicators);
     }
 
+    setSecretKeyDev():number[]{
+        return this.getSecretKeyDev();
+    }
 
+    getSecretKeyDev():number[]{
+        let secretKeyString = fs.readFileSync(this.secretkeyPath, "utf8");
+        const secretKey: SecretKeyObj = JSON.parse(secretKeyString);
+        return secretKey.pk
+    }
 
     setSecretKey(){
         return this.getSecretKey();
