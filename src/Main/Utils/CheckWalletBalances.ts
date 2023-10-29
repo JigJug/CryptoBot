@@ -21,25 +21,11 @@ function chekckWalletBalance(coin: string){
 
         const main = async () => {
             try {
-                //sol
-                const balance = await connection.getBalance(wallet);
-                console.log(`${balance / LAMPORTS_PER_SOL} SOL`);
-    
-                //usdc
-                const balanceUsdc = await connection.getParsedTokenAccountsByOwner(
-                    wallet, { mint: mintWalletUsdc }
-                );
-                const balanceUsdcParsed = balanceUsdc.value[0]?.account.data.parsed.info.tokenAmount.uiAmount;
-                console.log(`usdc balance: ${balanceUsdcParsed}`)
-                let inBalUsdc = parseInt(balanceUsdcParsed)
 
-                //orca
-                const balanceOrca = await connection.getParsedTokenAccountsByOwner(
-                    wallet, { mint: mintWalletOrca }
-                );
-                const balanceOrcaParsed = balanceOrca.value[0]?.account.data.parsed.info.tokenAmount.uiAmount;
-                console.log(`orca balance: ${balanceOrcaParsed}`)
-                let inBalOrca = parseInt(balanceOrcaParsed)
+    
+
+
+
 
                 //ray
                 //const balanceRay = await connection.getParsedTokenAccountsByOwner(
@@ -50,10 +36,27 @@ function chekckWalletBalance(coin: string){
                 //let inBalRay = parseInt(balanceRayParsed)
 
                 if(coin == 'ORCA'){
+                                    //orca
+                const balanceOrca = await connection.getParsedTokenAccountsByOwner(
+                    wallet, { mint: mintWalletOrca }
+                );
+                const balanceOrcaParsed = balanceOrca.value[0]?.account.data.parsed.info.tokenAmount.uiAmount;
+                console.log(`orca balance: ${balanceOrcaParsed}`)
+                let inBalOrca = parseInt(balanceOrcaParsed)
                     resolve(inBalOrca);
                 } else if(coin == 'SOL'){
+                                    //sol
+                const balance = await connection.getBalance(wallet);
+                console.log(`${balance / LAMPORTS_PER_SOL} SOL`);
                     resolve((balance/LAMPORTS_PER_SOL) - 0.04);
                 } else {
+                                    //usdc
+                const balanceUsdc = await connection.getParsedTokenAccountsByOwner(
+                    wallet, { mint: mintWalletUsdc }
+                );
+                const balanceUsdcParsed = balanceUsdc.value[0]?.account.data.parsed.info.tokenAmount.uiAmount;
+                console.log(`usdc balance: ${balanceUsdcParsed}`)
+                let inBalUsdc = parseInt(balanceUsdcParsed)
                     resolve(inBalUsdc);
                 }
             }

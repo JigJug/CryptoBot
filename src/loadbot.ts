@@ -25,9 +25,9 @@ async function loadBot(botConfig: BotConfig, events: EventEmitter, id: string, p
       sma: 0
     }
 
-    const keyPair = createWallet();
-    console.log('keypair generated for new bot')
-    console.log(keyPair.publicKey)
+    //const keyPair = createWallet();
+    //console.log('keypair generated for new bot')
+    //console.log(keyPair.publicKey)
 
     return new CryptoTradingBot(
       id,
@@ -36,7 +36,7 @@ async function loadBot(botConfig: BotConfig, events: EventEmitter, id: string, p
       indicators,
       client,
       events,
-      keyPair
+      //keyPair
     )
       
   } catch (err) {

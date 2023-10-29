@@ -1,13 +1,16 @@
 import { LoadExchange } from './DexClients/ExchangeLoader'
 import { getBalance } from './Utils/CheckWalletBalances'
 import { BotConfig, indicators, MarketDataObject, SecretKeyObj, SingleMarketObject } from '../typings'
-import { LoadStrategy } from './Strategy/LoadStrategy'
+import { Strategy } from './Strategy/LoadStrategy'
 import { FtxClient } from './DataClients/clients/FtxClient'
 import { EventEmitter } from 'events';
-import { MarketDataGrabber } from './marketdata'
+import { MarketDataController } from './marketdata'
 import { DataClient } from './DataClients/dataclient'
 import { createWallet } from './createwallet/createwallet'
-import { Keypair } from '@solana/web3.js'
+//import { Keypair } from '@solana/web3.js'
+import * as fs from 'fs'
+import * as dotenv from "dotenv";
+dotenv.config();
 
 class CryptoTradingBot {
     id
@@ -27,11 +30,11 @@ class CryptoTradingBot {
 
     events
     dataClient
-    marketDataGrabber
+    marketDataController
     dexClient
     strategy
-    keyPair: Keypair | null
-    secretKey: Uint8Array |null
+    //keyPair: Keypair | null
+    secretKey: number[] | Uint8Array | null
     secretKeyPath
     
     
@@ -42,32 +45,67 @@ class CryptoTradingBot {
         indicators: indicators,
         dataClient: DataClient,
         events: EventEmitter,
-        keyPair: Keypair,
+        //keyPair: Keypair,
     ){
-        this.id = id
-        this.pubkey = pubkey
-        this.pairing = botConfig.pairing
-        this.windowResolution = botConfig.windowResolution
-        this.marketData = botConfig.data
-        this.price = botConfig.data?.close
-        this.dex = botConfig.dex
-        this.stopLoss = botConfig.stopLoss
-        this.indicators = indicators
+        this.id = id;
+        this.pubkey = pubkey;
+        this.pairing = botConfig.pairing;
+        this.windowResolution = botConfig.windowResolution;
+        this.marketData = botConfig.data;
+        this.price = botConfig.data?.close;
+        this.dex = botConfig.dex;
+        this.stopLoss = botConfig.stopLoss;
+        this.indicators = indicators;
         
-        this.buySellTrigger = true
-        this.bought = true
-        this.sold = false
-        this.coin = 'SOL'
+        this.buySellTrigger = true;
+        this.bought = false;
+        this.sold = false;
+
+        (async () => {
+          const amm = await getBalance('');
+          if(amm < 3) {
+            this.bought = true
+            this.sold = false
+          } else {
+            this.bought = false
+            this.sold = true
+          }
+        })();
+
+        this.coin = 'SOL';
         //load the data and dex clients, emitters, secretkey and strategy
         this.events = events;
         this.dataClient = dataClient;
-        this.marketDataGrabber = this.setMarketDataGrabber();
+        this.marketDataController = this.setMarketDataController();
         this.dexClient = this.setDex();
         this.strategy = this.setStrategy();
-        this.keyPair = keyPair
-        this.secretKey = keyPair.secretKey
-        this.secretKeyPath = ''
+        //this.keyPair = keyPair
+        this.secretKeyPath = process.env.SECRET_KEY_PATH;
+        this.secretKey = this.setSecretKeyDev();//keyPair.secretKey
+        console.log(this.secretKey);
+        
     }
+
+    setMarketDataController(){
+      return new MarketDataController(this.dataClient, this.events, this.id, this.pubkey);
+  }
+
+  setStrategy(){
+      return this.getStrategy();
+  }
+
+  getStrategy(){
+      return new Strategy('simpleema').loadStrategy(
+        this.stopLoss,
+        this.events,
+        this.id,
+        this.pubkey
+      );
+  }
+
+  setDex(){
+      return new LoadExchange(this.dex).swapClient();
+  }
 
     startBot(){
         this.setStartBot();
@@ -77,10 +115,7 @@ class CryptoTradingBot {
         this.setPrice();
         this.setTimeFrameData();
         this.botStatusUpdate();
-        //this.buySellListeners();
     }
-
-
 
     //current price
     setPrice(){
@@ -88,19 +123,8 @@ class CryptoTradingBot {
     }
 
     getPrice(){
-        this.marketDataGrabber.sendPrice();
-        //this.events.on('SingleMarketData', (price: number) => {//SingleMarketObject) => {
-            //console.log(price)
-        //    this.price = price;
-        //    this.strategy.buySellLogic(price, this.indicators ,this.sold, this.bought, this.buySellTrigger);
-        //})
-
+        this.marketDataController.sendPrice();
     }
-    testPrice(){
-        return this.price;
-    }
-
-
 
     //market data
     setTimeFrameData(){
@@ -109,41 +133,8 @@ class CryptoTradingBot {
 
     getTimeFrameData(){
         let lastTime = this.marketData?.time;
-
-        this.marketDataGrabber.sendTimeFrameData(lastTime!);
-
-        //this.events.on('TimeFrameData', (md: MarketDataObject) => {
-        //    console.log(md)
-        //    this.updateIndicators(md);
-        //    this.updateMarketData(md);
-        //    console.log('updated market data: \n' + this.marketData?.time + '\n');
-        //    console.log('ema:: ',  this.indicators.ema);
-        //})
-
+        this.marketDataController.sendTimeFrameData(lastTime!);
     }
-
-
-
-    //buying and selling
-    /*buySellListeners(){
-
-        this.events.on('Buy', (buy: boolean, id) => {
-            console.log('recieved buy signal');
-            if(buy && this.buySellTrigger && this.sold){
-                this.getBuy();
-            }
-        });
-
-        this.events.on('Sell', (sell: boolean, id) => {
-            console.log('recieved sell signal');
-            if(sell && this.buySellTrigger && this.bought){
-                this.getSell();
-            }
-        })
-
-    }*/
-
-
 
     getBuy(){
         return this.buy('buy');
@@ -168,13 +159,15 @@ class CryptoTradingBot {
         });
     }
 
-
-
     getSell(){
         return this.sell('sell');
     }
 
     sell(side: string){
+        /*if(!this.bought && !this.sold) {
+            this.sold = true;
+            return
+        }*/
         this.buySellTrigger = false;
         getBalance(this.coin)
         .then((bal) => {
@@ -191,8 +184,6 @@ class CryptoTradingBot {
         });
     }
 
-
-
     botStatusUpdate(){
         setInterval(()=>{
             console.log(
@@ -205,8 +196,6 @@ class CryptoTradingBot {
             );
         }, 120000);
     }
-
-    
 
     updateMarketData(md: MarketDataObject){
         console.log('updating market data' );
@@ -228,48 +217,13 @@ class CryptoTradingBot {
     }
 
     getSecretKeyDev():number[]{
-        let secretKeyString = fs.readFileSync(this.secretkeyPath, "utf8");
+        let secretKeyString = fs.readFileSync(this.secretKeyPath, "utf8");
         const secretKey: SecretKeyObj = JSON.parse(secretKeyString);
-        return secretKey.pk
+        return secretKey.pk;
     }
 
-    setSecretKey(){
-        return this.getSecretKey();
-    }
-
-    getSecretKey(){
-        //let secretKeyString = fs.readFileSync(this.secretkeyPath, "utf8");
-        //const secretKey: SecretKeyObj = JSON.parse(secretKeyString);
-        //return secretKey.pk
-        this.keyPair = createWallet()
-        console.log('keypair generated for new bot')
-        console.log(this.keyPair.publicKey)
-        this.secretKey = this.keyPair.secretKey
-    }
-
-    setEventEmitter(){
-        return new EventEmitter();
-    }
-
-    setDataClient(){
-        return new FtxClient(this.pairing, this.windowResolution);
-    }
-
-    setMarketDataGrabber(){
-        return new MarketDataGrabber(this.dataClient, this.events, this.id, this.pubkey);
-    }
-
-    setStrategy(){
-        const strategy = this.getStrategy();
-        return new strategy(this.stopLoss, this.events, this.id, this.pubkey)
-    }
-
-    getStrategy(){
-        return new LoadStrategy('simpleema').loadStrategy();
-    }
-
-    setDex(){
-        return new LoadExchange(this.dex).swapClient();
+    stopBot() {
+        this.marketDataController.clearIntervals();
     }
 
 }

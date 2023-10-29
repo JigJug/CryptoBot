@@ -7,6 +7,7 @@ import { CryptoTradingBot } from './Main';
 import express from 'express';
 import cors from 'cors';
 import bodyParser from 'body-parser';
+
 const app = express();
 const port = 8080;
 
@@ -100,13 +101,41 @@ app.get('/', (req, res, next) => {
     
 })
 
+app.post('/botdeets', (req, res, next) => {
+  
+  const id = req.body.body.id;
+  const pubkey = req.body.body.pubkey;
+
+  if(!(pubkey in botController.bots)) {
+    res.send('no data')
+    return next();
+  }
+
+  const curBot = bot(id, pubkey)
+
+  const response = {
+    time: curBot.marketData?.time,
+    price: curBot.price,
+    ema: curBot.indicators.ema,
+    volume: curBot.marketData?.volume,
+    bought: `${curBot.bought}`,
+    sold: `${curBot.sold}`
+  }
+
+  res.send(response)
+  return next();
+    
+})
+
 app.post('/loadbot', async (req, res, next) => {
   console.log(req.body)
   const body = req.body.body;
   //res.set('Access-Control-Allow-Origin', '*');
   const id = await botController.loadbot(req.body.body.config, req.body.body.pubkey, events);
-  console.log(bot(id, body.pubkey).keyPair?.publicKey.toString())
-  res.send(bot(id, body.pubkey).keyPair?.publicKey.toString());
+  //console.log(bot(id, body.pubkey).keyPair?.publicKey.toString())
+  console.log(botController.bots)
+  res.send("CyQBLYTw1o1y38trQ1aYEBUAaRc5m26GTQHzscNwgqiB")//bot(id, body.pubkey).keyPair?.publicKey.toString());
+  bot(id, body.pubkey).startBot();
   next();
 })
 

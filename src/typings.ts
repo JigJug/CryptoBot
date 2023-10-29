@@ -90,3 +90,17 @@ export interface Endpoints {
     price: string;
     candleData: string;
 }
+
+export interface BaseStrategy {
+    buySellLogic: (
+        price: number,
+        indicators: indicators,
+        sold: boolean,
+        bought: boolean,
+        buySellTrigger: boolean
+    ) => void
+    updateIndicators: (
+        md: MarketDataObject,
+        indicators: indicators
+    ) => indicators
+}
