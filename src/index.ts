@@ -31,7 +31,6 @@ function bot(id: string, pubkey: string) {
 //})
 
 function getPrice(){
-
   events.on('SingleMarketData', (price: number, id: string, pubkey: string) => {//SingleMarketObject) => {
     const cb = bot(id, pubkey);
     cb.price = price
@@ -103,21 +102,19 @@ app.get('/', (req, res, next) => {
 
 app.post('/loadbot', async (req, res, next) => {
   console.log(req.body)
+  const body = req.body.body;
   //res.set('Access-Control-Allow-Origin', '*');
   const id = await botController.loadbot(req.body.body.config, req.body.body.pubkey, events);
-  console.log(bot(id, req.body.body.pubkey).keyPair?.publicKey.toString())
-  res.send(bot(id, req.body.body.pubkey).keyPair?.publicKey.toString());
-  
-  //console.log(req.body)
+  console.log(bot(id, body.pubkey).keyPair?.publicKey.toString())
+  res.send(bot(id, body.pubkey).keyPair?.publicKey.toString());
   next();
 })
 
 app.post('/startbot', async (req, res, next) => {
   console.log(req.body)
-  bot(req.body.body.id, req.body.body.pubkey).startBot()
+  const body = req.body.body;
+  bot(body.id, body.pubkey).startBot()
   res.send('bot started');
-
-  console.log(req.body)
   next();
 })
   

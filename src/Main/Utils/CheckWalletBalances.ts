@@ -19,12 +19,11 @@ function chekckWalletBalance(coin: string){
         let rayMint = '4k3Dyjzvzp8eMZWUXbBCjEvwSkkk59S5iCNLY3QrkX6R'
         let mintWalletray = new PublicKey(rayMint);
 
-    
         const main = async () => {
             try {
                 //sol
-                //const balance = await connection.getBalance(wallet);
-                //console.log(`${balance / LAMPORTS_PER_SOL} SOL`);
+                const balance = await connection.getBalance(wallet);
+                console.log(`${balance / LAMPORTS_PER_SOL} SOL`);
     
                 //usdc
                 const balanceUsdc = await connection.getParsedTokenAccountsByOwner(
@@ -34,14 +33,13 @@ function chekckWalletBalance(coin: string){
                 console.log(`usdc balance: ${balanceUsdcParsed}`)
                 let inBalUsdc = parseInt(balanceUsdcParsed)
 
-    
                 //orca
-                //const balanceOrca = await connection.getParsedTokenAccountsByOwner(
-                //    wallet, { mint: mintWalletOrca }
-                //);
-                //const balanceOrcaParsed = balanceOrca.value[0]?.account.data.parsed.info.tokenAmount.uiAmount;
-                //console.log(`orca balance: ${balanceOrcaParsed}`)
-                //let inBalOrca = parseInt(balanceOrcaParsed)
+                const balanceOrca = await connection.getParsedTokenAccountsByOwner(
+                    wallet, { mint: mintWalletOrca }
+                );
+                const balanceOrcaParsed = balanceOrca.value[0]?.account.data.parsed.info.tokenAmount.uiAmount;
+                console.log(`orca balance: ${balanceOrcaParsed}`)
+                let inBalOrca = parseInt(balanceOrcaParsed)
 
                 //ray
                 //const balanceRay = await connection.getParsedTokenAccountsByOwner(
@@ -52,25 +50,19 @@ function chekckWalletBalance(coin: string){
                 //let inBalRay = parseInt(balanceRayParsed)
 
                 if(coin == 'ORCA'){
-                    //resolve(inBalOrca);
-                }
-                //else if(coin == 'RAY'){
-                //    resolve(inBalRay);
-                //}
-                else {
+                    resolve(inBalOrca);
+                } else if(coin == 'SOL'){
+                    resolve((balance/LAMPORTS_PER_SOL) - 0.04);
+                } else {
                     resolve(inBalUsdc);
                 }
-                
             }
             catch (err){
                 console.log(err)
                 reject(err)
             }
-            
         }
-    
         main();
-
     })
 }
 

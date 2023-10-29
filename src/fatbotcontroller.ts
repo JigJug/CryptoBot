@@ -1,6 +1,6 @@
 import { EventEmitter } from "events";
 import { CryptoTradingBot } from "./Main";
-import startBot from "./StartBot";
+import loadBot from "./loadbot";
 import { BotConfig } from "./typings";
 
 interface Bots {
@@ -14,22 +14,20 @@ export class FatBotController {
   currentId: string
   constructor(){
     this.bots = {};
-    this.currentId = "000000";
+    this.currentId = "100000";
   }
 
   private generateId() {
-    console.log(this.currentId)
     let id = parseInt(this.currentId, 16);
-    this.currentId = '878g8g8ggg'//(id + 1).toString();
-    console.log(this.currentId)
-    return '878g8g8ggg'//(id + 1).toString()
+    this.currentId = (id + 1).toString(16).toUpperCase();
+    return this.currentId;
   }
 
   async loadbot(botConfig: BotConfig, pubkey: string, events: EventEmitter) {
     console.log(botConfig, pubkey)
     const pk = pubkey.toString()
     const newId = this.generateId();
-    const nb = await startBot(botConfig, events, this.currentId, pubkey);
+    const nb = await loadBot(botConfig, events, this.currentId, pubkey);
     const newb = {}
     newb[newId] = nb
     //nb?.startBot();
@@ -37,9 +35,6 @@ export class FatBotController {
     console.log(this.bots)
     return newId;
   }
-
-
-
 }
 
 
