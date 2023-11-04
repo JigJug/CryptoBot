@@ -5,7 +5,7 @@
   "main": "index.js",
   "scripts": {
     "test": "test",
-    "start": "./run.sh"
+    "start": "bash ./run.sh"
   },
   "repository": {
     "type": "git",
