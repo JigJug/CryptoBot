@@ -9,7 +9,7 @@ import cors from 'cors';
 import bodyParser from 'body-parser';
 
 const app = express();
-const port = process.env.PORT;//8080;
+const port = process.env.PORT || 8080;//8080;
 
 type SelectBot = {[key: string]: {[key:string]: CryptoTradingBot}}
 

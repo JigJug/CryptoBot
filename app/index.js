@@ -19,7 +19,7 @@ const express_1 = __importDefault(require("express"));
 const cors_1 = __importDefault(require("cors"));
 const body_parser_1 = __importDefault(require("body-parser"));
 const app = (0, express_1.default)();
-const port = 8080;
+const port = process.env.PORT || 8080; //8080;
 const events = new events_1.EventEmitter();
 const botController = new fatbotcontroller_1.FatBotController();
 function bot(id, pubkey) {
@@ -94,7 +94,7 @@ app.post('/botdeets', (req, res, next) => __awaiter(void 0, void 0, void 0, func
         return next();
     }
     const curBot = bot(id, pubkey);
-    const { usdc, sol } = yield curBot.checkBalance();
+    //const {usdc, sol} = await curBot.checkBalance();
     const response = {
         time: (_a = curBot.marketData) === null || _a === void 0 ? void 0 : _a.time,
         price: curBot.price,
@@ -102,8 +102,8 @@ app.post('/botdeets', (req, res, next) => __awaiter(void 0, void 0, void 0, func
         volume: (_b = curBot.marketData) === null || _b === void 0 ? void 0 : _b.volume,
         bought: `${curBot.bought}`,
         sold: `${curBot.sold}`,
-        usdc: `${usdc.toFixed(5)}`,
-        sol: `${sol.toFixed(5)}`
+        //usdc: `${usdc.toFixed(5)}`,
+        //sol: `${sol.toFixed(5)}`
     };
     res.send(response);
     return next();

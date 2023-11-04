@@ -1,6 +1,5 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-const StoreDataToJson_1 = require("../../Utils/StoreDataToJson");
 const EMA_1 = require("../../Strategy/Indicators/EMA");
 const SMA_1 = require("../../Strategy/Indicators/SMA");
 function calcEmaStoreData(data, emaPeriod, pairing, windowResolution) {
@@ -20,14 +19,14 @@ function calcEmaStoreData(data, emaPeriod, pairing, windowResolution) {
             return currentValue;
         };
         let addedEma = data.map(calcEma);
+        resolve(addedEma);
         //store data to json (filename: coin + time)
-        let newJson = new StoreDataToJson_1.StoreDataJson(`.\\MarketData\\`, pairing.replace('/', ''), windowResolution);
-        newJson.storeToJson(addedEma).then(() => {
-            resolve(addedEma);
-        })
-            .catch((err) => {
-            reject('EMA calc ERROR: ' + err);
-        });
+        //let newJson = new StoreDataJson(`.\\MarketData\\`,pairing.replace('/', ''), windowResolution);
+        //newJson.storeToJson(addedEma).then(() => {
+        //    resolve(addedEma);
+        //}).catch((err) => {
+        //    reject('EMA calc ERROR: '+err);
+        //})
     });
 }
 exports.default = calcEmaStoreData;
