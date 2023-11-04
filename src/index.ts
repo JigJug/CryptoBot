@@ -101,7 +101,11 @@ app.get('/', (req, res, next) => {
     
 })
 
-app.post('/botdeets', (req, res, next) => {
+app.post('/botdeets', async (req, res, next) => {
+
+  const del = () => {
+    return new Promise(res => setTimeout(res, 2000))
+  }
   
   const id = req.body.body.id;
   const pubkey = req.body.body.pubkey;
@@ -113,13 +117,17 @@ app.post('/botdeets', (req, res, next) => {
 
   const curBot = bot(id, pubkey)
 
+  //const {usdc, sol} = await curBot.checkBalance();
+
   const response = {
     time: curBot.marketData?.time,
     price: curBot.price,
     ema: curBot.indicators.ema,
     volume: curBot.marketData?.volume,
     bought: `${curBot.bought}`,
-    sold: `${curBot.sold}`
+    sold: `${curBot.sold}`,
+    //usdc: `${usdc.toFixed(5)}`,
+    //sol: `${sol.toFixed(5)}`
   }
 
   res.send(response)

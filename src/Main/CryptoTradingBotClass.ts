@@ -81,7 +81,7 @@ class CryptoTradingBot {
         this.strategy = this.setStrategy();
         //this.keyPair = keyPair
         this.secretKeyPath = process.env.SECRET_KEY_PATH;
-        this.secretKey = this.setSecretKeyDev();//keyPair.secretKey
+        this.secretKey = process.env.SECRET_KEY_PATH;//this.setSecretKeyDev();//keyPair.secretKey
         console.log(this.secretKey);
         
     }
@@ -217,13 +217,20 @@ class CryptoTradingBot {
     }
 
     getSecretKeyDev():number[]{
-        let secretKeyString = fs.readFileSync(this.secretKeyPath, "utf8");
-        const secretKey: SecretKeyObj = JSON.parse(secretKeyString);
-        return secretKey.pk;
+        //let secretKeyString = fs.readFileSync(this.secretKeyPath, "utf8");
+        //const secretKey: SecretKeyObj = JSON.parse(secretKeyString);
+        //return secretKey.pk;
     }
 
     stopBot() {
         this.marketDataController.clearIntervals();
+    }
+
+    async checkBalance() {
+        const usdc = await getBalance('');
+        await (() => new Promise(res => setTimeout(res, 1000)))();
+        const sol = await getBalance(this.coin);
+        return {usdc, sol}
     }
 
 }

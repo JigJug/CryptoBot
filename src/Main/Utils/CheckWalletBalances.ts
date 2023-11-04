@@ -3,7 +3,7 @@ import { clusterApiUrl, Connection, PublicKey, LAMPORTS_PER_SOL } from "@solana/
 function chekckWalletBalance(coin: string){
     return new Promise<number>((resolve, reject) => {
 
-        console.log('running balances!')
+        //console.log('running balances!')
 
         const connection = new Connection(clusterApiUrl("mainnet-beta"), "confirmed");
 
@@ -41,13 +41,13 @@ function chekckWalletBalance(coin: string){
                     wallet, { mint: mintWalletOrca }
                 );
                 const balanceOrcaParsed = balanceOrca.value[0]?.account.data.parsed.info.tokenAmount.uiAmount;
-                console.log(`orca balance: ${balanceOrcaParsed}`)
+                //console.log(`orca balance: ${balanceOrcaParsed}`)
                 let inBalOrca = parseInt(balanceOrcaParsed)
                     resolve(inBalOrca);
                 } else if(coin == 'SOL'){
                                     //sol
                 const balance = await connection.getBalance(wallet);
-                console.log(`${balance / LAMPORTS_PER_SOL} SOL`);
+                //console.log(`${balance / LAMPORTS_PER_SOL} SOL`);
                     resolve((balance/LAMPORTS_PER_SOL) - 0.04);
                 } else {
                                     //usdc
@@ -55,7 +55,7 @@ function chekckWalletBalance(coin: string){
                     wallet, { mint: mintWalletUsdc }
                 );
                 const balanceUsdcParsed = balanceUsdc.value[0]?.account.data.parsed.info.tokenAmount.uiAmount;
-                console.log(`usdc balance: ${balanceUsdcParsed}`)
+                //console.log(`usdc balance: ${balanceUsdcParsed}`)
                 let inBalUsdc = parseInt(balanceUsdcParsed)
                     resolve(inBalUsdc);
                 }
