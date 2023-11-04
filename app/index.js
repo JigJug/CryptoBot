@@ -109,7 +109,6 @@ app.post('/botdeets', (req, res, next) => __awaiter(void 0, void 0, void 0, func
     return next();
 }));
 app.post('/loadbot', (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
-    console.log(req.body);
     const body = req.body.body;
     //res.set('Access-Control-Allow-Origin', '*');
     const id = yield botController.loadbot(req.body.body.config, req.body.body.pubkey, events);
@@ -120,7 +119,6 @@ app.post('/loadbot', (req, res, next) => __awaiter(void 0, void 0, void 0, funct
     next();
 }));
 app.post('/startbot', (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
-    console.log(req.body);
     const body = req.body.body;
     bot(body.id, body.pubkey).startBot();
     res.send('bot started');

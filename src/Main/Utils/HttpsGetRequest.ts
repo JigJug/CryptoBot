@@ -13,7 +13,6 @@ export class HttpsGetRequest {
             https.get(endPoint, (res: any) => {
 
                 res.on('data', (d: any) => {
-                    console.log(d.toString())
                     opStr = opStr + d.toString()
                 });
 

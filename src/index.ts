@@ -136,7 +136,6 @@ app.post('/botdeets', async (req, res, next) => {
 })
 
 app.post('/loadbot', async (req, res, next) => {
-  console.log(req.body)
   const body = req.body.body;
   //res.set('Access-Control-Allow-Origin', '*');
   const id = await botController.loadbot(req.body.body.config, req.body.body.pubkey, events);
@@ -148,7 +147,6 @@ app.post('/loadbot', async (req, res, next) => {
 })
 
 app.post('/startbot', async (req, res, next) => {
-  console.log(req.body)
   const body = req.body.body;
   bot(body.id, body.pubkey).startBot()
   res.send('bot started');
