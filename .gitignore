@@ -3,3 +3,4 @@ app
 MarketData
 TestScripts
 package-lock.json
+.env
