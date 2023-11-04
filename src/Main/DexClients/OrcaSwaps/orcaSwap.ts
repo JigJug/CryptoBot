@@ -3,7 +3,7 @@ import { getOrca, OrcaPoolConfig, OrcaPoolToken} from "@orca-so/sdk";
 import Decimal from "decimal.js";
 
 
-export function orcaApiSwap(ammount: number, side: string, secretKey: number[], pairing: string){
+export function orcaApiSwap(ammount: number, side: string, secretKey: number[]|Uint8Array |null, pairing: string){
     return new Promise<void>((resolve, reject) => {
 
         const swap = async () => {
@@ -15,8 +15,8 @@ export function orcaApiSwap(ammount: number, side: string, secretKey: number[], 
             const fromOrcaPoolConfig = OrcaPoolConfig[`${orcaPairing}` as keyof typeof OrcaPoolConfig]
 
             //Read secret key file to get owner keypair
-            const unit8Sk = Uint8Array.from(secretKey);
-            const owner = Keypair.fromSecretKey(unit8Sk);
+            const unit8Sk = Uint8Array.from(secretKey!);
+            const owner = Keypair.fromSecretKey(unit8Sk!);
 
             //Initialzie Orca object with mainnet connection
             const connection = new Connection("https://api.mainnet-beta.solana.com", "singleGossip");

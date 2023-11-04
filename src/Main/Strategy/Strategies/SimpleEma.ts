@@ -1,16 +1,20 @@
-import { indicators, MarketDataObject, SingleMarketObject } from "../../../typings"
+import { BaseStrategy, indicators, MarketDataObject, SingleMarketObject } from "../../../typings"
 import { EMA } from "../Indicators/EMA"
 
-export class SimpleEmaStrategy{
+export class SimpleEmaStrategy implements BaseStrategy{
 
     stopLoss
     eventEmitter
     ema
+    id
+    pubkey
 
-    constructor(stopLoss: number, eventEmitter: NodeJS.EventEmitter){
+    constructor(stopLoss: number, eventEmitter: NodeJS.EventEmitter, id: string, pubkey: string){
         this.stopLoss = stopLoss
         this.eventEmitter = eventEmitter
         this.ema = new EMA(70);
+        this.id = id;
+        this.pubkey = pubkey
     }
 
 
@@ -23,14 +27,14 @@ export class SimpleEmaStrategy{
         if(buySellTrigger && sold){
             if(price > ema){
                 console.log('buyemitter trigger', price, ema);
-                this.eventEmitter.emit('Buy', true);
+                this.eventEmitter.emit('Buy', true, this.id, this.pubkey);
             }
         }
 
         else if(buySellTrigger && bought){
-            if(price < stopPrice){
+            if(price < ema){
                 console.log('sellemitter trigger', price, ema);
-                this.eventEmitter.emit('Sell', true);
+                this.eventEmitter.emit('Sell', true, this.id, this.pubkey);
             }
         }
     }
@@ -40,7 +44,7 @@ export class SimpleEmaStrategy{
         return indicators
     }
 
-    calcEma(close: number, emaYesterday: number){
+    private calcEma(close: number, emaYesterday: number){
         console.log('calcing ema')
         const ema = this.ema;
         return ema.emaCalc(close, emaYesterday);

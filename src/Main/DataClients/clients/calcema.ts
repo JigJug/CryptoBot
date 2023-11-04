@@ -24,15 +24,16 @@ function calcEmaStoreData(data:any, emaPeriod: number, pairing: string, windowRe
         }
     
         let addedEma = data.map(calcEma);
+
+        resolve(addedEma);
     
         //store data to json (filename: coin + time)
-        let newJson = new StoreDataJson(`.\\MarketData\\`,pairing.replace('/', ''), windowResolution);
-        newJson.storeToJson(addedEma).then(() => {
-            resolve(addedEma);
-        })
-        .catch((err) => {
-            reject('EMA calc ERROR: '+err);
-        })
+        //let newJson = new StoreDataJson(`.\\MarketData\\`,pairing.replace('/', ''), windowResolution);
+        //newJson.storeToJson(addedEma).then(() => {
+        //    resolve(addedEma);
+        //}).catch((err) => {
+        //    reject('EMA calc ERROR: '+err);
+        //})
     })
 }
 

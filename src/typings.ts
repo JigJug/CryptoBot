@@ -18,7 +18,6 @@ export interface MarketDataObject {
 export interface BotConfig {
     pairing: string;
     windowResolution: string;
-    secretKeyPath: string;
     emaInterval: string;
     cexData: string;
     dex: string;
@@ -90,4 +89,18 @@ export interface DataClientHandler {
 export interface Endpoints {
     price: string;
     candleData: string;
+}
+
+export interface BaseStrategy {
+    buySellLogic: (
+        price: number,
+        indicators: indicators,
+        sold: boolean,
+        bought: boolean,
+        buySellTrigger: boolean
+    ) => void
+    updateIndicators: (
+        md: MarketDataObject,
+        indicators: indicators
+    ) => indicators
 }
