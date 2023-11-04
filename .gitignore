@@ -1,7 +1,5 @@
 node_modules
-app
 MarketData
 TestScripts
 .env
 package-lock.json
-.env
