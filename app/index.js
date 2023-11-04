@@ -128,6 +128,11 @@ app.get('/maxtest', (req, res, next) => __awaiter(void 0, void 0, void 0, functi
     res.send('hi max youre a cunt');
     next();
 }));
+app.post('/maxtestpost', (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
+    console.log(req.body);
+    res.send('hi cunt');
+    next();
+}));
 app.listen(port, () => {
     console.log(`Example app listening on port ${port}`);
 });

@@ -157,6 +157,12 @@ app.get('/maxtest', async (req, res, next) => {
   res.send('hi max youre a cunt')
   next();
 })
+
+app.post('/maxtestpost', async (req, res, next) => {
+  console.log(req.body)
+  res.send('hi cunt');
+  next();
+})
   
 app.listen(port, () => {
   console.log(`Example app listening on port ${port}`)
