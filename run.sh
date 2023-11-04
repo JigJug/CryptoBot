@@ -1,2 +1,2 @@
-npm install
+npx tsc
 node ./app/index.js

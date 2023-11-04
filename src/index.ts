@@ -152,6 +152,11 @@ app.post('/startbot', async (req, res, next) => {
   res.send('bot started');
   next();
 })
+
+app.get('/maxtest', async (req, res, next) => {
+  res.send('hi max youre a cunt')
+  next();
+})
   
 app.listen(port, () => {
   console.log(`Example app listening on port ${port}`)

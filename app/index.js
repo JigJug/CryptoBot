@@ -124,6 +124,10 @@ app.post('/startbot', (req, res, next) => __awaiter(void 0, void 0, void 0, func
     res.send('bot started');
     next();
 }));
+app.get('/maxtest', (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
+    res.send('hi max youre a cunt');
+    next();
+}));
 app.listen(port, () => {
     console.log(`Example app listening on port ${port}`);
 });
