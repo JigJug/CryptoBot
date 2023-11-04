@@ -1,5 +1,4 @@
 import { orcaApiSwap } from "./OrcaSwaps/orcaSwap";
-import { raydiumApiSwap } from "./RaydiumSwaps/RaydiumSwap"
 
 
 export class LoadExchange{
@@ -14,9 +13,6 @@ export class LoadExchange{
         if(this.exchange == 'orca'){
             return this.getOrca();
         }
-        else if(this.exchange == 'raydium'){
-            return this.getRaydium();
-        }
         else{
             return (ammount: number, side: string, secretKey: number[]|Uint8Array|null, pairing: string) => {
                 return new Promise((resolve, reject)=>{
@@ -30,9 +26,7 @@ export class LoadExchange{
         return orcaApiSwap
     }
 
-    getRaydium(){
-        return raydiumApiSwap
-    }
+
 
 
 
