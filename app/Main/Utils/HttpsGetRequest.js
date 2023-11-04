@@ -32,6 +32,7 @@ class HttpsGetRequest {
             let opStr = '';
             https.get(endPoint, (res) => {
                 res.on('data', (d) => {
+                    console.log(d.toString());
                     opStr = opStr + d.toString();
                 });
                 res.on('end', () => {
