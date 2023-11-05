@@ -1,14 +1,10 @@
 import { LoadExchange } from './DexClients/ExchangeLoader'
 import { getBalance } from './Utils/CheckWalletBalances'
-import { BotConfig, indicators, MarketDataObject, SecretKeyObj, SingleMarketObject } from '../typings'
+import { BotConfig, indicators, MarketDataObject} from '../typings'
 import { Strategy } from './Strategy/LoadStrategy'
-import { FtxClient } from './DataClients/clients/FtxClient'
 import { EventEmitter } from 'events';
 import { MarketDataController } from './marketdata'
 import { DataClient } from './DataClients/dataclient'
-import { createWallet } from './createwallet/createwallet'
-//import { Keypair } from '@solana/web3.js'
-import * as fs from 'fs'
 import * as dotenv from "dotenv";
 dotenv.config();
 
@@ -212,11 +208,13 @@ class CryptoTradingBot {
         this.indicators = this.strategy.updateIndicators(md, this.indicators);
     }
 
-    setSecretKeyDev():number[]{
+    setSecretKeyDev(){
         return this.getSecretKeyDev();
     }
 
-    getSecretKeyDev():number[]{
+    getSecretKeyDev() {
+        const key = process.env.SECRET_KEY;
+        return key?.split(',').map(v => parseInt(v));
         //let secretKeyString = fs.readFileSync(this.secretKeyPath, "utf8");
         //const secretKey: SecretKeyObj = JSON.parse(secretKeyString);
         //return secretKey.pk;
