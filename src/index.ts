@@ -7,6 +7,7 @@ import { CryptoTradingBot } from './Main';
 import express from 'express';
 import cors from 'cors';
 import bodyParser from 'body-parser';
+import { MongoClient, ServerApiVersion } from 'mongodb';
 
 const app = express();
 const port = process.env.PORT || 8080;//8080;
@@ -16,6 +17,55 @@ type SelectBot = {[key: string]: {[key:string]: CryptoTradingBot}}
 const events = new EventEmitter();
 
 const botController = new FatBotController();
+
+
+
+
+
+
+
+
+
+
+
+const uri = "mongodb+srv://easybot-alesam:alesam333@cluster0.uijr1x0.mongodb.net/?retryWrites=true&w=majority";
+
+// Create a MongoClient with a MongoClientOptions object to set the Stable API version
+const client = new MongoClient(uri, {
+  serverApi: {
+    version: ServerApiVersion.v1,
+    strict: true,
+    deprecationErrors: true,
+  }
+});
+
+async function run() {
+  try {
+    // Connect the client to the server	(optional starting in v4.7)
+    await client.connect();
+    // Send a ping to confirm a successful connection
+    await client.db("admin").command({ ping: 1 });
+    console.log("Pinged your deployment. You successfully connected to MongoDB!");
+  } finally {
+    // Ensures that the client will close when you finish/error
+    await client.close();
+  }
+}
+run().catch(console.dir);
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 function bot(id: string, pubkey: string) {
   return botController.bots[pubkey][id];
