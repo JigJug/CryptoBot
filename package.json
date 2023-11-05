@@ -5,7 +5,9 @@
   "main": "index.js",
   "scripts": {
     "test": "test",
-    "start": "bash ./run.sh"
+    "start": "node ./app/index.js",
+    "deploy": "git push heroku heroku:main",
+    "build": ""
   },
   "repository": {
     "type": "git",
