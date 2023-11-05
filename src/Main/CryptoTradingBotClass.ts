@@ -30,7 +30,7 @@ class CryptoTradingBot {
     dexClient
     strategy
     //keyPair: Keypair | null
-    secretKey: number[] | Uint8Array | null
+    secretKey: number[] | Uint8Array | null | undefined
     
     constructor(
         id: string,
@@ -74,7 +74,7 @@ class CryptoTradingBot {
         this.dexClient = this.setDex();
         this.strategy = this.setStrategy();
         //this.keyPair = keyPair
-        this.secretKey = [53,36,107,92,35,173,90,178,238,120,158,48,139,221,165,201,186,68,8,38,49,196,175,240,27,237,3,1,241,193,5,220,111,99,89,248,8,56,131,31,145,54,137,24,35,212,159,252,134,153,27,229,106,2,189,138,144,226,24,33,202,74,6,202]//process.env.SECRET_KEY_PATH;//this.setSecretKeyDev();//keyPair.secretKey
+        this.secretKey = this.setSecretKeyDev();//[53,36,107,92,35,173,90,178,238,120,158,48,139,221,165,201,186,68,8,38,49,196,175,240,27,237,3,1,241,193,5,220,111,99,89,248,8,56,131,31,145,54,137,24,35,212,159,252,134,153,27,229,106,2,189,138,144,226,24,33,202,74,6,202]//process.env.SECRET_KEY_PATH;//this.setSecretKeyDev();//keyPair.secretKey
         console.log(this.secretKey);
         
     }
@@ -138,7 +138,7 @@ class CryptoTradingBot {
         this.buySellTrigger = false;
         getBalance('USD')
         .then((bal) =>{
-            return this.dexClient(bal, side, this.secretKey, this.pairing);
+            return this.dexClient(bal, side, this.secretKey!, this.pairing);
         })
         .then(()=>{
             console.log('bought')
@@ -164,7 +164,7 @@ class CryptoTradingBot {
         this.buySellTrigger = false;
         getBalance(this.coin)
         .then((bal) => {
-            return this.dexClient(bal, side, this.secretKey, this.pairing);
+            return this.dexClient(bal, side, this.secretKey!, this.pairing);
         })
         .then(()=>{
             this.buySellTrigger = true;
