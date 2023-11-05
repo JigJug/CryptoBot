@@ -24,15 +24,16 @@
     "typescript": "^4.2.3"
   },
   "dependencies": {
-    "@cowprotocol/cow-sdk": "^3.0.0",
-    "@raydium-io/raydium-sdk": "^0.0.1",
     "@binance/connector": "^3.0.0-rc.2",
+    "@cowprotocol/cow-sdk": "^3.0.0",
     "@orca-so/sdk": "^1.2.26",
+    "@raydium-io/raydium-sdk": "^0.0.1",
     "@solana/web3.js": "^1.87.1",
     "body-parser": "^1.20.2",
     "cors": "^2.8.5",
     "decimal.js": "^10.4.3",
+    "dotenv": "^16.3.1",
     "express": "^4.18.2",
-    "dotenv": "^16.3.1"
+    "mongodb": "^6.2.0"
   }
 }
