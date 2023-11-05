@@ -23,6 +23,20 @@ const app = (0, express_1.default)();
 const port = process.env.PORT || 8080; //8080;
 const events = new events_1.EventEmitter();
 const botController = new fatbotcontroller_1.FatBotController();
+const exampledata = {
+    userwallet: "43t3q4tg34tg34tg34tg34yt45y",
+    botid: 21133,
+    botprivkey: "34,34,34,234,34,42,34,,34,24",
+    botbubkey: "34tq34tgergghwqhqw435hwq45h",
+    pairing: "SOL/USDT",
+    windowResolution: "5m",
+    emaInterval: "70",
+    cexData: "binance",
+    dex: "orca",
+    stopLoss: 0.02,
+};
+const db = "easybotdb";
+const dbcollection = "user_wallet_addresses";
 const uri = process.env.MONGO_CONNECT; //"mongodb+srv://easybot-alesam:alesam333@cluster0.uijr1x0.mongodb.net/?retryWrites=true&w=majority";
 // Create a MongoClient with a MongoClientOptions object to set the Stable API version
 const client = new mongodb_1.MongoClient(uri, {
@@ -32,7 +46,7 @@ const client = new mongodb_1.MongoClient(uri, {
         deprecationErrors: true,
     }
 });
-function run() {
+function mongoConnect() {
     return __awaiter(this, void 0, void 0, function* () {
         try {
             // Connect the client to the server	(optional starting in v4.7)
@@ -47,7 +61,12 @@ function run() {
         }
     });
 }
-run().catch(console.error);
+function checkbot() {
+    return __awaiter(this, void 0, void 0, function* () {
+        const resp = yield client.db(db).collection(dbcollection).findOne({ userwallet: "43t3q4tg34tg34tg34tg34yt45y" });
+        console.log(resp);
+    });
+}
 function bot(id, pubkey) {
     return botController.bots[pubkey][id];
 }
@@ -100,14 +119,17 @@ function listeners() {
     buySellListeners();
 }
 exports.listeners = listeners;
+mongoConnect().catch(console.error);
 listeners();
 app.use((0, cors_1.default)());
 app.use(body_parser_1.default.json());
 app.use(body_parser_1.default.urlencoded({ extended: false }));
-app.get('/', (req, res, next) => {
+app.get('/', (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
+    yield checkbot();
     //res.set('Access-Control-Allow-Origin', '*');
     res.send('HELLO FROM BOT GET REQUEST');
-});
+    next();
+}));
 app.post('/botdeets', (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
     var _a, _b;
     const del = () => {
