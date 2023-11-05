@@ -47,7 +47,7 @@ function run() {
         }
     });
 }
-run().catch(console.dir);
+run().catch(console.error);
 function bot(id, pubkey) {
     return botController.bots[pubkey][id];
 }
