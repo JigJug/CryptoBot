@@ -23,7 +23,7 @@ const app = (0, express_1.default)();
 const port = process.env.PORT || 8080; //8080;
 const events = new events_1.EventEmitter();
 const botController = new fatbotcontroller_1.FatBotController();
-const uri = "mongodb+srv://easybot-alesam:alesam333@cluster0.uijr1x0.mongodb.net/?retryWrites=true&w=majority";
+const uri = process.env.MONGO_CONNECT; //"mongodb+srv://easybot-alesam:alesam333@cluster0.uijr1x0.mongodb.net/?retryWrites=true&w=majority";
 // Create a MongoClient with a MongoClientOptions object to set the Stable API version
 const client = new mongodb_1.MongoClient(uri, {
     serverApi: {
