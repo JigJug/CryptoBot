@@ -21,12 +21,22 @@ const botController = new FatBotController();
 
 
 
+const exampledata = {
+  userwallet: "43t3q4tg34tg34tg34tg34yt45y",
+  botid: 21133,
+  botprivkey: "34,34,34,234,34,42,34,,34,24",
+  botbubkey: "34tq34tgergghwqhqw435hwq45h",
+  pairing: "SOL/USDT",
+  windowResolution: "5m",
+  emaInterval: "70",
+  cexData: "binance",
+  dex: "orca",
+  stopLoss: 0.02,
+}
 
 
-
-
-
-
+const db = "easybotdb"
+const dbcollection = "user_wallet_addresses"
 
 
 
@@ -39,20 +49,25 @@ const client = new MongoClient(uri!, {
   }
 });
 
-async function run() {
+async function mongoConnect() {
   try {
     // Connect the client to the server	(optional starting in v4.7)
     await client.connect();
     // Send a ping to confirm a successful connection
     await client.db("admin").command({ ping: 1 });
     console.log("Pinged your deployment. You successfully connected to MongoDB!");
+    
   } finally {
     // Ensures that the client will close when you finish/error
     await client.close();
   }
 }
-run().catch(console.error);
 
+async function checkbot() {
+  const resp = await client.db(db).collection(dbcollection).findOne({userwallet: "43t3q4tg34tg34tg34tg34yt45y"});
+  console.log(resp)
+
+}
 
 
 
@@ -138,16 +153,22 @@ export function listeners() {
 
 
 
+
+
+
+mongoConnect().catch(console.error);
+
 listeners();
 
 app.use(cors());
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({extended: false}))
 
-app.get('/', (req, res, next) => {
-  
+app.get('/', async (req, res, next) => {
+  await checkbot();
   //res.set('Access-Control-Allow-Origin', '*');
   res.send('HELLO FROM BOT GET REQUEST')
+  next();
     
 })
 
