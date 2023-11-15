@@ -63,16 +63,19 @@ async function mongoConnect() {
   }
 }
 
-async function checkbot() {
-  const resp = await client.db(db).collection(dbcollection).findOne({userwallet: "43t3q4tg34tg34tg34tg34yt45y"});
-  console.log(resp)
-
+function checkbot() {
+  const resp = client.db(db).collection(dbcollection).find();
+  return resp.toArray();
 }
 
 
-
-
-
+(async()=>{
+  const resp = await checkbot();
+  if(resp===null)return
+  const bots = resp.map((v) => {
+    
+  })
+})
 
 
 
@@ -165,7 +168,7 @@ app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({extended: false}))
 
 app.get('/', async (req, res, next) => {
-  await checkbot();
+  
   //res.set('Access-Control-Allow-Origin', '*');
   res.send('HELLO FROM BOT GET REQUEST')
   next();
@@ -209,9 +212,26 @@ app.post('/botdeets', async (req, res, next) => {
 app.post('/loadbot', async (req, res, next) => {
   const body = req.body.body;
   //res.set('Access-Control-Allow-Origin', '*');
-  const id = await botController.loadbot(req.body.body.config, req.body.body.pubkey, events);
+  const id = botController.generateId()
+
+  await botController.loadbot(body.config, body.pubkey, events);
+
+  await client.db(db).collection(dbcollection).insertOne({
+    userwallet: body.pubkey,
+    botid: id,
+    botPrivkey: '34r2f',
+    botPubkey: 'f32f3',
+    pairing: body.config.pairing,
+    windowResolution: body.config.windowResolution,
+    emaInterval: body.config.emaInterval,
+    cexData: body.config.cexData,
+    dex: body.config.dex,
+    stopLoss: body.config.stopLoss
+  })
+
+  
   //console.log(bot(id, body.pubkey).keyPair?.publicKey.toString())
-  console.log(botController.bots)
+  //console.log(botController.bots)
   res.send("CyQBLYTw1o1y38trQ1aYEBUAaRc5m26GTQHzscNwgqiB")//bot(id, body.pubkey).keyPair?.publicKey.toString());
   bot(id, body.pubkey).startBot();
   next();
