@@ -1,20 +1,21 @@
-import { BotConfig, DataClientHandler, Endpoints, MarketDataObject } from "../../../typings";
+import {
+  BotConfig,
+  DataClientHandler,
+  Endpoints,
+  MarketDataObject,
+} from "../../../typings";
 import { BaseClient } from "../baseclient";
 import calcEmaStoreData from "./calcema";
 
 export class BinanceClient extends BaseClient implements DataClientHandler {
+  constructor(endpoints: Endpoints) {
+    super(endpoints);
+  }
 
-    constructor(endpoints: Endpoints) {
-      super(endpoints)
-    }
-
-  async processHistoricData(
-    config: BotConfig,
-  ) {
-
+  async processHistoricData(config: BotConfig) {
     const mapBinanceCandleData = (data: any): MarketDataObject[] => {
-      console.log('mapping data')
-      return data.map((v : any) => {
+      console.log("mapping data");
+      return data.map((v: any) => {
         return {
           startTime: v[0],
           time: v[6],
@@ -23,17 +24,22 @@ export class BinanceClient extends BaseClient implements DataClientHandler {
           low: parseFloat(v[3]),
           close: parseFloat(v[4]),
           volume: parseFloat(v[5]),
-        }
-      })
-    }
+        };
+      });
+    };
 
     try {
       const historicCandleData = await this.candleData();
-      console.log(this.endpoints.candleData)
+      console.log(this.endpoints.candleData);
       const data = mapBinanceCandleData(JSON.parse(historicCandleData));
-      const dataWithEma = await calcEmaStoreData(data, parseInt(config.emaInterval), config.pairing, '300');
+      const dataWithEma = await calcEmaStoreData(
+        data,
+        parseInt(config.emaInterval),
+        config.pairing,
+        "300"
+      );
       const md = dataWithEma.reverse();
-      return md[1]
+      return md[1];
     } catch (err) {
       throw err;
     }
@@ -44,9 +50,7 @@ export class BinanceClient extends BaseClient implements DataClientHandler {
       const priceRet = await this.price();
       return parseFloat(JSON.parse(priceRet).price);
     } catch (err) {
-      throw err
+      throw err;
     }
-
   }
 }
-

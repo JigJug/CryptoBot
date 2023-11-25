@@ -1,25 +1,21 @@
-import { MarketDataObject } from "../../../typings"
+import { MarketDataObject } from "../../../typings";
 
-export class SMA{
+export class SMA {
+  period: number;
 
-    period: number
+  constructor(period: number) {
+    this.period = period;
+  }
 
-    constructor(
-        period: number,
-    ){
-        this.period = period
+  //methods
+
+  smaCalc(data: MarketDataObject[]) {
+    let totalPrice = 0;
+
+    for (let i = 0; i < this.period; i++) {
+      totalPrice = totalPrice + data[i].close;
     }
 
-    //methods
-
-    smaCalc(data: MarketDataObject[]){
-        let totalPrice = 0;
-
-        for(let i = 0; i < this.period; i++){
-            totalPrice = totalPrice + data[i].close; 
-        }
-        
-        return totalPrice / this.period
-    }
-
+    return totalPrice / this.period;
+  }
 }
