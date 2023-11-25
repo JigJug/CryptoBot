@@ -5,14 +5,14 @@ import { BotConfig } from "./typings";
 
 interface Bots {
   [key: string]: {
-    [key:string]: CryptoTradingBot
-  }
+    [key: string]: CryptoTradingBot;
+  };
 }
 
 export class FatBotController {
-  bots: Bots
-  currentId: string
-  constructor(){
+  bots: Bots;
+  currentId: string;
+  constructor() {
     this.bots = {};
     this.currentId = "100000";
   }
@@ -24,12 +24,12 @@ export class FatBotController {
   }
 
   async loadbot(botConfig: BotConfig, pubkey: string, events: EventEmitter) {
-    console.log(botConfig, pubkey)
-    const pk = pubkey.toString()
+    console.log(botConfig, pubkey);
+    const pk = pubkey.toString();
     //const newId = this.generateId();
     const nb = await loadBot(botConfig, events, this.currentId, pubkey);
-    const newb = {}
-    newb[this.id] = nb
+    const newb = {};
+    newb[this.id] = nb;
     //nb?.startBot();
     this.bots[pk] = newb;
     //console.log(this.bots)
@@ -42,6 +42,3 @@ export class FatBotController {
     //const zx = await resp3.toArray()
   }
 }
-
-
-

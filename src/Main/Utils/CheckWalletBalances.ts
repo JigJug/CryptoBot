@@ -1,75 +1,78 @@
-import { clusterApiUrl, Connection, PublicKey, LAMPORTS_PER_SOL } from "@solana/web3.js";
+import {
+  clusterApiUrl,
+  Connection,
+  PublicKey,
+  LAMPORTS_PER_SOL,
+} from "@solana/web3.js";
 
-function chekckWalletBalance(coin: string){
-    return new Promise<number>((resolve, reject) => {
+function chekckWalletBalance(coin: string) {
+  return new Promise<number>((resolve, reject) => {
+    //console.log('running balances!')
 
-        //console.log('running balances!')
+    const connection = new Connection(
+      clusterApiUrl("mainnet-beta"),
+      "confirmed"
+    );
 
-        const connection = new Connection(clusterApiUrl("mainnet-beta"), "confirmed");
+    let pubKey = "8Vp83HeSX1YavzXhSsKyrZpRzjwJAbPxd6zyLp5YuTBF";
+    let wallet = new PublicKey(pubKey);
 
-        let pubKey = '8Vp83HeSX1YavzXhSsKyrZpRzjwJAbPxd6zyLp5YuTBF'
-        let wallet = new PublicKey(pubKey);
-    
-        let usdcMint = 'EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v'
-        let mintWalletUsdc = new PublicKey(usdcMint);
-    
-        let orcaMint = 'orcaEKTdK7LKz57vaAYr9QeNsVEPfiu6QeMU1kektZE'
-        let mintWalletOrca = new PublicKey(orcaMint);
+    let usdcMint = "EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v";
+    let mintWalletUsdc = new PublicKey(usdcMint);
 
-        let rayMint = '4k3Dyjzvzp8eMZWUXbBCjEvwSkkk59S5iCNLY3QrkX6R'
-        let mintWalletray = new PublicKey(rayMint);
+    let orcaMint = "orcaEKTdK7LKz57vaAYr9QeNsVEPfiu6QeMU1kektZE";
+    let mintWalletOrca = new PublicKey(orcaMint);
 
-        const main = async () => {
-            try {
+    let rayMint = "4k3Dyjzvzp8eMZWUXbBCjEvwSkkk59S5iCNLY3QrkX6R";
+    let mintWalletray = new PublicKey(rayMint);
 
-    
+    const main = async () => {
+      try {
+        //ray
+        //const balanceRay = await connection.getParsedTokenAccountsByOwner(
+        //    wallet, { mint: mintWalletray }
+        //);
+        //const balanceRayParsed = balanceRay.value[0]?.account.data.parsed.info.tokenAmount.uiAmount;
+        //console.log(`ray balance: ${balanceRayParsed}`)
+        //let inBalRay = parseInt(balanceRayParsed)
 
-
-
-
-                //ray
-                //const balanceRay = await connection.getParsedTokenAccountsByOwner(
-                //    wallet, { mint: mintWalletray }
-                //);
-                //const balanceRayParsed = balanceRay.value[0]?.account.data.parsed.info.tokenAmount.uiAmount;
-                //console.log(`ray balance: ${balanceRayParsed}`)
-                //let inBalRay = parseInt(balanceRayParsed)
-
-                if(coin == 'ORCA'){
-                                    //orca
-                const balanceOrca = await connection.getParsedTokenAccountsByOwner(
-                    wallet, { mint: mintWalletOrca }
-                );
-                const balanceOrcaParsed = balanceOrca.value[0]?.account.data.parsed.info.tokenAmount.uiAmount;
-                //console.log(`orca balance: ${balanceOrcaParsed}`)
-                let inBalOrca = parseInt(balanceOrcaParsed)
-                    resolve(inBalOrca);
-                } else if(coin == 'SOL'){
-                                    //sol
-                const balance = await connection.getBalance(wallet);
-                //console.log(`${balance / LAMPORTS_PER_SOL} SOL`);
-                    resolve((balance/LAMPORTS_PER_SOL) - 0.04);
-                } else {
-                                    //usdc
-                const balanceUsdc = await connection.getParsedTokenAccountsByOwner(
-                    wallet, { mint: mintWalletUsdc }
-                );
-                const balanceUsdcParsed = balanceUsdc.value[0]?.account.data.parsed.info.tokenAmount.uiAmount;
-                //console.log(`usdc balance: ${balanceUsdcParsed}`)
-                let inBalUsdc = parseInt(balanceUsdcParsed)
-                    resolve(inBalUsdc);
-                }
-            }
-            catch (err){
-                console.log(err)
-                reject(err)
-            }
+        if (coin == "ORCA") {
+          //orca
+          const balanceOrca = await connection.getParsedTokenAccountsByOwner(
+            wallet,
+            { mint: mintWalletOrca }
+          );
+          const balanceOrcaParsed =
+            balanceOrca.value[0]?.account.data.parsed.info.tokenAmount.uiAmount;
+          //console.log(`orca balance: ${balanceOrcaParsed}`)
+          let inBalOrca = parseInt(balanceOrcaParsed);
+          resolve(inBalOrca);
+        } else if (coin == "SOL") {
+          //sol
+          const balance = await connection.getBalance(wallet);
+          //console.log(`${balance / LAMPORTS_PER_SOL} SOL`);
+          resolve(balance / LAMPORTS_PER_SOL - 0.04);
+        } else {
+          //usdc
+          const balanceUsdc = await connection.getParsedTokenAccountsByOwner(
+            wallet,
+            { mint: mintWalletUsdc }
+          );
+          const balanceUsdcParsed =
+            balanceUsdc.value[0]?.account.data.parsed.info.tokenAmount.uiAmount;
+          //console.log(`usdc balance: ${balanceUsdcParsed}`)
+          let inBalUsdc = parseInt(balanceUsdcParsed);
+          resolve(inBalUsdc);
         }
-        main();
-    })
+      } catch (err) {
+        console.log(err);
+        reject(err);
+      }
+    };
+    main();
+  });
 }
 
-export function getBalance(coin: string){
-    return chekckWalletBalance(coin);
+export function getBalance(coin: string) {
+  return chekckWalletBalance(coin);
 }
-
