@@ -1,10 +1,15 @@
 import EventEmitter from "events";
 import { Client } from "./Main/DataClients/dataclient";
-import {CryptoTradingBot} from "./Main/index";
+import { CryptoTradingBot } from "./Main/index";
 import { BotConfig, indicators } from "./typings";
 import { createWallet } from "./Main/createwallet/createwallet";
 
-async function loadBot(botConfig: BotConfig, events: EventEmitter, id: string, pubkey: string) {
+async function loadBot(
+  botConfig: BotConfig,
+  events: EventEmitter,
+  id: string,
+  pubkey: string
+) {
   try {
     //load in cex data client and get historic candle data to calc indicators
     //pass the client and last candle data to a new bot instance
@@ -13,17 +18,17 @@ async function loadBot(botConfig: BotConfig, events: EventEmitter, id: string, p
 
     console.log(botConfig.data);
 
-    if(botConfig.data == null) throw new Error('can not get market data');
+    if (botConfig.data == null) throw new Error("can not get market data");
 
-    console.log(botConfig.pairing, botConfig.windowResolution, botConfig.data)
-    console.log('start new bot instance')
+    console.log(botConfig.pairing, botConfig.windowResolution, botConfig.data);
+    console.log("start new bot instance");
 
     const indicators: indicators = {
       ema: botConfig.data.ema,
       rsi: 0,
       macd: 0,
-      sma: 0
-    }
+      sma: 0,
+    };
 
     //const keyPair = createWallet();
     //console.log('keypair generated for new bot')
@@ -35,16 +40,12 @@ async function loadBot(botConfig: BotConfig, events: EventEmitter, id: string, p
       botConfig,
       indicators,
       client,
-      events,
+      events
       //keyPair
-    )
-      
+    );
   } catch (err) {
-    console.error(err)
+    console.error(err);
   }
 }
 
-export default loadBot
-
-
-
+export default loadBot;
