@@ -3,7 +3,7 @@ import { BotConfig, Endpoints } from "../../typings";
 function binanceEndpoints(config: BotConfig) {
     const baseUrl = 'https://api.binance.com/api/v3/'
     return {
-        candleData: `${baseUrl}klines?symbol=${config.pairing.replace('/', '')}&interval=${config.windowResolution}`,
+        candleData: `${baseUrl}klines?symbol=${config.pairing.replace('/', '')}&interval=${config.windowResolution}&limit=1000`,
         price: `${baseUrl}ticker/price?symbol=${config.pairing.replace('/', '')}`
       }
 }
