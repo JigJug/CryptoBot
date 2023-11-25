@@ -34,7 +34,7 @@ const exampledata = {
 const db = "easybotdb";
 const dbcollection = "user_wallet_addresses";
 
-const uri = process.env.MONGO_CONNECT; //"mongodb+srv://easybot-alesam:alesam333@cluster0.uijr1x0.mongodb.net/?retryWrites=true&w=majority";
+const uri = process.env.MONGO_CONNECT;
 
 // Create a MongoClient with a MongoClientOptions object to set the Stable API version
 const client = new MongoClient(uri!, {
