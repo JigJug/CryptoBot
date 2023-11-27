@@ -11,6 +11,7 @@ dotenv.config();
 class CryptoTradingBot {
   id;
   pubkey;
+  stratName
   pairing;
   windowResolution;
   marketData;
@@ -43,6 +44,7 @@ class CryptoTradingBot {
   ) {
     this.id = id;
     this.pubkey = pubkey;
+    this.stratName = botConfig.strategy;
     this.pairing = botConfig.pairing;
     this.windowResolution = botConfig.windowResolution;
     this.marketData = botConfig.data;
@@ -93,7 +95,7 @@ class CryptoTradingBot {
   }
 
   getStrategy() {
-    return new Strategy("simpleema").loadStrategy(
+    return new Strategy(this.stratName).loadStrategy(
       this.stopLoss,
       this.events,
       this.id,

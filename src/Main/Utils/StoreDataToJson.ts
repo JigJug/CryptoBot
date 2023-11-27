@@ -31,3 +31,7 @@ export class StoreDataJson {
     });
   }
 }
+
+export function appendCsv(path: string, data: string) {
+  fs.appendFileSync(path, data);
+}

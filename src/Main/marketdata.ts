@@ -41,7 +41,7 @@ export class MarketDataController {
   }
 
   sendTimeFrameData(lastTime: number) {
-    let TimeFrame: number = 1000 * 300; //need something to convert numbers to binance naming eg 300 = 4h //parseInt(this.client.config.windowResolution);
+    let TimeFrame: number = 1000 * 300; //need something to convert numbers to binance naming eg 300 = 5m //parseInt(this.client.config.windowResolution);
     let timeMills: number;
     let timeDiff: number;
 
