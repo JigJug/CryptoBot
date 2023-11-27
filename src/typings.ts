@@ -24,6 +24,7 @@ export interface BotConfig {
   dex: string;
   stopLoss: number;
   data: null | MarketDataObject;
+  strategy: string;
 }
 
 export interface HistoricData {}

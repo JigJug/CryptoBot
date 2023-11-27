@@ -31,7 +31,7 @@ function candleJsonToCsv() {
   }
 }
 
-async function runModel(script: string) {
+export async function runModel(script: string) {
   try {
     const op = await PythonShell.run(script);
     return op;
@@ -40,7 +40,7 @@ async function runModel(script: string) {
   }
 }
 
-function process(data: string[]) {
+export function process(data: string[]) {
   return data.filter((v: string) => {
     return v.indexOf("Prediction") !== -1? v: null
   }).map((v: string) => {
@@ -72,8 +72,6 @@ function getBuySell(deces: Decessions[]) {
   const calcPcnt = (num1: number, num2: number) => {
     return (num2 - num1) / num1;
   }
-
-
   
   const op = [];
   let curPos = '';
