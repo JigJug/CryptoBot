@@ -14,7 +14,7 @@ import { Web3Provider } from "@ethersproject/providers";
  *
  * **MAKE SURE YOU HAVE ENABLED SELL TOKEN IN YOUR WALLET**
  */
-
+/*
 async function getMarketPrice() {
   const orderBookApi = new OrderBookApi({ chainId: SupportedChainId.MAINNET });
 
@@ -83,4 +83,4 @@ async function signOrder() {
     SupportedChainId.MAINNET,
     signer
   );
-}
+}*/

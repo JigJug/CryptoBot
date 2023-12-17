@@ -18,7 +18,7 @@ export class Strategy {
   ) {
     const strategy: Record<string, () => BaseStrategy> = {
       simpleema: () => new SimpleEmaStrategy(stopLoss, events, id, pubkey),
-      superStrategy: () => new SuperStrategy(stopLoss, events, id, pubkey)
+      superstrategy: () => new SuperStrategy(stopLoss, events, id, pubkey)
     };
     return strategy[this.strategy]();
   }
