@@ -96,3 +96,8 @@ export interface BaseStrategy {
     indicators: indicators
   ) => indicators;
 }
+
+
+export interface DexSwap {
+  swap: (ammount: number, side: string, secretKey: Uint8Array | number[] | null, pairing: string) => Promise<void>
+}
