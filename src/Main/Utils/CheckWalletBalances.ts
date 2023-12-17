@@ -28,13 +28,6 @@ function chekckWalletBalance(coin: string) {
 
     const main = async () => {
       try {
-        //ray
-        //const balanceRay = await connection.getParsedTokenAccountsByOwner(
-        //    wallet, { mint: mintWalletray }
-        //);
-        //const balanceRayParsed = balanceRay.value[0]?.account.data.parsed.info.tokenAmount.uiAmount;
-        //console.log(`ray balance: ${balanceRayParsed}`)
-        //let inBalRay = parseInt(balanceRayParsed)
 
         if (coin == "ORCA") {
           //orca
@@ -52,6 +45,17 @@ function chekckWalletBalance(coin: string) {
           const balance = await connection.getBalance(wallet);
           //console.log(`${balance / LAMPORTS_PER_SOL} SOL`);
           resolve(balance / LAMPORTS_PER_SOL - 0.04);
+
+        } else if(coin == "RAY"){
+          //ray
+          const balanceRay = await connection.getParsedTokenAccountsByOwner(
+            wallet, { mint: mintWalletray }
+          );
+          const balanceRayParsed = balanceRay.value[0]?.account.data.parsed.info.tokenAmount.uiAmount;
+
+          let inBalRay = parseInt(balanceRayParsed);
+          resolve(inBalRay)
+          
         } else {
           //usdc
           const balanceUsdc = await connection.getParsedTokenAccountsByOwner(
