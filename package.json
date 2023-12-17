@@ -5,7 +5,7 @@
   "main": "index.js",
   "scripts": {
     "test": "test",
-    "start": "node ./app/index.js",
+    "start": "npx tsc && node ./app/index.js",
     "deploy": "git push heroku heroku:main",
     "build": ""
   },
@@ -26,10 +26,9 @@
     "typescript": "^4.2.3"
   },
   "dependencies": {
-    "@binance/connector": "^3.0.0-rc.2",
     "@cowprotocol/cow-sdk": "^3.0.0",
     "@orca-so/sdk": "^1.2.26",
-    "@raydium-io/raydium-sdk": "^0.0.1",
+    "@raydium-io/raydium-sdk": "^1.3.1-beta.38",
     "@solana/web3.js": "^1.87.1",
     "body-parser": "^1.20.2",
     "cors": "^2.8.5",

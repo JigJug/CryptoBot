@@ -1,143 +1,209 @@
-import { Connection, Keypair, PublicKey } from "@solana/web3.js";
+import assert from 'assert';
+
 import {
+  jsonInfo2PoolKeys,
   Liquidity,
+  LiquidityPoolKeys,
+  Percent,
   Token,
   TokenAmount,
-  Percent,
-} from "@raydium-io/raydium-sdk";
-import { fetchPoolKeys } from "./util_mainnet";
-import { getTokenAccountsByOwner } from "./util";
+  buildSimpleTransaction,
+  InnerSimpleV0Transaction,
+  SPL_ACCOUNT_LAYOUT,
+  TOKEN_PROGRAM_ID,
+  TokenAccount,
+  ENDPOINT as _ENDPOINT,
+  Currency,
+  LOOKUP_TABLE_CACHE,
+  MAINNET_PROGRAM_ID,
+  RAYDIUM_MAINNET,
+  TxVersion,
+  LiquidityPoolKeysV4,
+} from '@raydium-io/raydium-sdk';
+import {
+  Connection,
+  Keypair,
+  PublicKey,
+  SendOptions,
+  Signer,
+  Transaction,
+  VersionedTransaction,
+  clusterApiUrl,
+} from '@solana/web3.js';
 import { RaydiumPools } from "./RaydiumPools";
 
-export function raydiumApiSwap(
+type WalletTokenAccounts = Awaited<ReturnType<typeof getWalletTokenAccount>>
+type TestTxInputInfo = {
+  outputToken: Token
+  targetPool: string
+  inputTokenAmount: TokenAmount
+  slippage: Percent
+  walletTokenAccounts: WalletTokenAccounts
+  wallet: Keypair
+}
+
+const connection = new Connection(
+  //"https://solana-api.projectserum.com",
+  clusterApiUrl("mainnet-beta"),
+  "confirmed"
+);
+
+const ENDPOINT = _ENDPOINT;
+
+const RAYDIUM_MAINNET_API = RAYDIUM_MAINNET;
+
+const makeTxVersion = TxVersion.V0; // LEGACY
+
+const addLookupTableInfo = LOOKUP_TABLE_CACHE // only mainnet. other = undefined
+
+async function sendTx(
+  connection: Connection,
+  payer: Keypair | Signer,
+  txs: (VersionedTransaction | Transaction)[],
+  options?: SendOptions
+): Promise<string[]> {
+  const txids: string[] = [];
+  for (const iTx of txs) {
+    if (iTx instanceof VersionedTransaction) {
+      iTx.sign([payer]);
+      txids.push(await connection.sendTransaction(iTx, options));
+    } else {
+      txids.push(await connection.sendTransaction(iTx, [payer], options));
+    }
+  }
+  return txids;
+}
+
+async function getWalletTokenAccount(connection: Connection, wallet: PublicKey): Promise<TokenAccount[]> {
+  const walletTokenAccount = await connection.getTokenAccountsByOwner(wallet, {
+    programId: TOKEN_PROGRAM_ID,
+  });
+  return walletTokenAccount.value.map((i) => ({
+    pubkey: i.pubkey,
+    programId: i.account.owner,
+    accountInfo: SPL_ACCOUNT_LAYOUT.decode(i.account.data),
+  }));
+}
+
+async function buildAndSendTx(wallet: Keypair, innerSimpleV0Transaction: InnerSimpleV0Transaction[], options?: SendOptions) {
+  const willSendTx = await buildSimpleTransaction({
+    connection,
+    makeTxVersion,
+    payer: wallet.publicKey,
+    innerTransactions: innerSimpleV0Transaction,
+    addLookupTableInfo: addLookupTableInfo,
+  })
+
+  return await sendTx(connection, wallet, willSendTx, options)
+}
+
+/**
+ * step 1: coumpute amount out
+ * step 2: create instructions by SDK function
+ * step 3: compose instructions to several transactions
+ * step 4: send transactions
+ */
+async function swapOnlyAmm(wallet: Keypair, input: TestTxInputInfo, poolKeys: LiquidityPoolKeysV4) {
+
+  // -------- step 1: coumpute amount out --------
+  const { amountOut, minAmountOut } = Liquidity.computeAmountOut({
+    poolKeys: poolKeys,
+    poolInfo: await Liquidity.fetchInfo({ connection, poolKeys }),
+    amountIn: input.inputTokenAmount,
+    currencyOut: input.outputToken,
+    slippage: input.slippage,
+  })
+
+  // -------- step 2: create instructions by SDK function --------
+  const { innerTransactions } = await Liquidity.makeSwapInstructionSimple({
+    connection,
+    poolKeys,
+    userKeys: {
+      tokenAccounts: input.walletTokenAccounts,
+      owner: input.wallet.publicKey,
+    },
+    amountIn: input.inputTokenAmount,
+    amountOut: minAmountOut,
+    fixedSide: 'in',
+    makeTxVersion,
+  })
+
+  console.log('amountOut:', amountOut.toFixed(), '  minAmountOut: ', minAmountOut.toFixed())
+
+  return { txids: await buildAndSendTx(wallet, innerTransactions) }
+}
+
+function delay() {
+  return new Promise(res => {
+    setTimeout(res, 500)
+  })
+}
+
+async function checkTransactionError(startTime: number, signature: string) {
+  let newtime = new Date().getTime();
+  let tdiff = newtime - startTime;
+  if (tdiff > 30000) {
+    throw new Error("tx check timeout")
+  }
+  await delay()
+  const status = await connection.getSignatureStatus(signature);
+
+  if (status.value?.confirmationStatus == "confirmed") {
+    console.log(status)
+    if (status.value?.err) {
+      throw new Error("tx failed")
+    } else {
+      return
+    }
+  }
+  checkTransactionError(startTime, signature);
+}
+
+function checkTx(signature: string) {
+  let startTime = new Date().getTime();
+  return checkTransactionError(startTime, signature);
+}
+
+export async function raydiumApiSwap(
   ammount: number,
   side: string,
-  secretKey: Uint8Array | null,
+  secretKey: number[] | Uint8Array | null,
   pairing: string
 ) {
-  return new Promise<void>((resolve, reject) => {
-    const swap = async () => {
-      let raydiumPairing: string = pairing.replace("/", "_");
-      const fromRaydiumPools =
-        RaydiumPools[raydiumPairing as keyof typeof RaydiumPools];
-      console.log(`fetched pool key ${raydiumPairing}: ${fromRaydiumPools}`);
 
-      const connection = new Connection(
-        "https://solana-api.projectserum.com",
-        "confirmed"
-      );
-      const skBuffer = Buffer.from(secretKey!);
-      const ownerKeypair = Keypair.fromSecretKey(skBuffer);
-      const owner = ownerKeypair.publicKey;
+  // -------- pre-action: get pool info --------
+  const targetPool = RaydiumPools[pairing.replace("/", "_") as keyof typeof RaydiumPools];// USDC-RAY pool
+  const ammPool = await (await fetch(ENDPOINT + RAYDIUM_MAINNET_API.poolInfo)).json() // If the Liquidity pool is not required for routing, then this variable can be configured as undefined
+  const targetPoolInfo = [...ammPool.official, ...ammPool.unOfficial].find((info) => info.id === targetPool)
+  assert(targetPoolInfo, 'cannot find the target pool')
+  const poolKeys = jsonInfo2PoolKeys(targetPoolInfo) as LiquidityPoolKeys
 
-      try {
-        const tokenAccounts = await getTokenAccountsByOwner(connection, owner);
-        console.log("connected token account");
-        const poolKeys = await fetchPoolKeys(
-          connection,
-          new PublicKey(fromRaydiumPools)
-        );
-        console.log(`fetched pool keys: ${poolKeys}`);
-        console.log(poolKeys.marketBids);
+  const skBuffer = Buffer.from(secretKey!);
+  const wallet = Keypair.fromSecretKey(skBuffer);
 
-        if (poolKeys) {
-          const poolInfo = await Liquidity.fetchInfo({ connection, poolKeys });
-          ammount = ammount * 1000000;
-          let coinIn: PublicKey;
-          let coinOut: PublicKey;
-          if (side == "buy") {
-            coinIn = poolKeys.quoteMint;
-            coinOut = poolKeys.baseMint;
-          } else {
-            coinIn = poolKeys.baseMint;
-            coinOut = poolKeys.quoteMint;
-          }
+  const [token] = pairing.split("/");
 
-          const amountIn = new TokenAmount(new Token(coinIn, 6), ammount);
-          const currencyOut = new Token(coinOut, 6);
-          const slippage = new Percent(5, 100);
+  const decimal = token === "SOL"? 9 : 6;
 
-          const {
-            amountOut,
-            minAmountOut,
-            currentPrice,
-            executionPrice,
-            priceImpact,
-            fee,
-          } = Liquidity.computeAmountOut({
-            poolKeys,
-            poolInfo,
-            amountIn,
-            currencyOut,
-            slippage,
-          });
+  const tk = new Token(TOKEN_PROGRAM_ID, poolKeys.baseMint, decimal);
+  const usd = new Token(TOKEN_PROGRAM_ID, poolKeys.quoteMint, decimal);
 
-          const excPr = () => {
-            if (executionPrice != null) {
-              return executionPrice.toFixed();
-            }
-          };
+  const inputToken = (side === "buy")? usd : tk;
+  const outputToken = (side === "buy")? tk : usd;
 
-          console.log(
-            amountOut.toFixed(),
-            minAmountOut.toFixed(),
-            currentPrice.toFixed(),
-            excPr(),
-            priceImpact.toFixed(),
-            fee.toFixed()
-          );
+  const inputTokenAmount = new TokenAmount(inputToken, ammount * 1000000)
+  const slippage = new Percent(1, 100)
+  
+  const walletTokenAccounts = await getWalletTokenAccount(connection, wallet.publicKey)
 
-          const { transaction, signers } = await Liquidity.makeSwapTransaction({
-            connection,
-            poolKeys,
-            userKeys: {
-              tokenAccounts,
-              owner,
-            },
-            amountIn,
-            amountOut: minAmountOut,
-            fixedSide: "in",
-          });
+  const txids = await swapOnlyAmm(wallet, {
+    outputToken,
+    targetPool,
+    inputTokenAmount,
+    slippage,
+    walletTokenAccounts,
+    wallet: wallet,
+  }, poolKeys);
 
-          const signature = await connection.sendTransaction(
-            transaction,
-            [...signers, ownerKeypair],
-            { skipPreflight: true }
-          );
-          console.log(signature);
-
-          //check transaction
-          let timeNow = new Date().getTime();
-
-          function checkTransactionError(timeNow: number, signature: string) {
-            let newtime = new Date().getTime();
-            let tdiff = newtime - timeNow;
-            if (tdiff > 30000) {
-              return reject(new Error("Transaction not processed"));
-            }
-
-            const checkConfirmation = async () => {
-              const status = await connection.getSignatureStatus(signature);
-
-              if (status.value?.confirmationStatus == "confirmed") {
-                if (status.value?.err) {
-                  console.log("error");
-                  return reject(new Error("Transaction Failed"));
-                } else {
-                  return resolve();
-                }
-              }
-              checkTransactionError(timeNow, signature);
-            };
-            return checkConfirmation();
-          }
-
-          checkTransactionError(timeNow, signature);
-        }
-      } catch (err) {
-        reject(err);
-      }
-    };
-    swap();
-  });
+  await checkTx(txids.txids[0]);
 }

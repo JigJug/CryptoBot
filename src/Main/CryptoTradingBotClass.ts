@@ -1,6 +1,6 @@
 import { LoadExchange } from "./DexClients/ExchangeLoader";
 import { getBalance } from "./Utils/CheckWalletBalances";
-import { BotConfig, indicators, MarketDataObject } from "../typings";
+import { BotConfig, DexSwap, indicators, MarketDataObject } from "../typings";
 import { Strategy } from "./Strategy/LoadStrategy";
 import { EventEmitter } from "events";
 import { MarketDataController } from "./marketdata";
@@ -28,7 +28,7 @@ class CryptoTradingBot {
   events;
   dataClient;
   marketDataController;
-  dexClient;
+  dexClient: DexSwap;
   strategy;
   //keyPair: Keypair | null
   secretKey: number[] | Uint8Array | null | undefined;
@@ -144,7 +144,7 @@ class CryptoTradingBot {
     this.buySellTrigger = false;
     getBalance("USD")
       .then((bal) => {
-        return this.dexClient(bal, side, this.secretKey!, this.pairing);
+        return this.dexClient.swap(bal, side, this.secretKey!, this.pairing);
       })
       .then(() => {
         console.log("bought");
@@ -170,7 +170,7 @@ class CryptoTradingBot {
     this.buySellTrigger = false;
     getBalance(this.coin)
       .then((bal) => {
-        return this.dexClient(bal, side, this.secretKey!, this.pairing);
+        return this.dexClient.swap(bal, side, this.secretKey!, this.pairing);
       })
       .then(() => {
         this.buySellTrigger = true;
@@ -217,7 +217,7 @@ class CryptoTradingBot {
 
   getSecretKeyDev() {
     const key = process.env.SECRET_KEY;
-    return key?.split(",").map((v) => parseInt(v));
+    return key?.split(",").map(v => parseInt(v));
     //let secretKeyString = fs.readFileSync(this.secretKeyPath, "utf8");
     //const secretKey: SecretKeyObj = JSON.parse(secretKeyString);
     //return secretKey.pk;
