@@ -26,14 +26,10 @@ export class FatBotController {
   async loadbot(botConfig: BotConfig, pubkey: string, events: EventEmitter) {
     console.log(botConfig, pubkey);
     const pk = pubkey.toString();
-    //const newId = this.generateId();
     const nb = await loadBot(botConfig, events, this.currentId, pubkey);
-    const newb = {};
-    newb[this.id] = nb;
-    //nb?.startBot();
+    const newb: any = {};
+    newb[this.currentId] = nb;
     this.bots[pk] = newb;
-    //console.log(this.bots)
-    //return newId;
   }
 
   async retrieveBots() {
