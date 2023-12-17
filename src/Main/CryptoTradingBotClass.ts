@@ -5,8 +5,6 @@ import { Strategy } from "./Strategy/LoadStrategy";
 import { EventEmitter } from "events";
 import { MarketDataController } from "./marketdata";
 import { DataClient } from "./DataClients/dataclient";
-import * as dotenv from "dotenv";
-dotenv.config();
 
 class CryptoTradingBot {
   id;
