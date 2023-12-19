@@ -66,7 +66,7 @@ export class SuperStrategy implements BaseStrategy {
 
   private async run() {
     try {
-      const data = await runModel("./runprediction.py");
+      const data = await runModel("./app/Main/Strategy/Strategies/superstrategy/runprediction.py");
       const decessions: Decessions[] = process(data);
       this.currentDecession = decessions[decessions.length -1].Decision
     } catch (err) {
