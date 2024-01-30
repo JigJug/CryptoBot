@@ -15,7 +15,7 @@ export class StoreDataJson {
     this.name2 = name2;
   }
 
-  storeToJson(data: []) {
+  storeToJson(data: any ) {// was this? dont know why? data: []) {
     return new Promise<void>((resolve, reject) => {
       let fileName = `${this.path}${this.name1}${this.name2}.json`;
       let dataStr = JSON.stringify(data, null, 2);
