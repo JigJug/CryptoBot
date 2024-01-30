@@ -1,7 +1,7 @@
 import { Endpoints } from "../../typings";
 import { HttpsGetRequest } from "../Utils/HttpsGetRequest";
 
-export class BaseClient extends HttpsGetRequest {
+export class BaseApiClient extends HttpsGetRequest {
   endpoints: Endpoints;
   constructor(endPoints: Endpoints) {
     super();
@@ -18,4 +18,8 @@ export class BaseClient extends HttpsGetRequest {
   private async get(endpoint: string) {
     return this.httpsGet(endpoint);
   }
+}
+
+export class BaseDegenClient {
+  
 }

@@ -4,10 +4,10 @@ import {
   Endpoints,
   MarketDataObject,
 } from "../../../typings";
-import { BaseClient } from "../baseclient";
+import { BaseApiClient } from "../baseclient";
 import calcEmaStoreData from "./calcema";
 
-export class BinanceClient extends BaseClient implements DataClientHandler {
+export class BinanceClient extends BaseApiClient implements DataClientHandler {
   constructor(endpoints: Endpoints) {
     super(endpoints);
   }

@@ -1,5 +1,4 @@
 import assert from 'assert';
-
 import {
   jsonInfo2PoolKeys,
   Liquidity,
@@ -9,9 +8,7 @@ import {
   TokenAmount,
   buildSimpleTransaction,
   InnerSimpleV0Transaction,
-  SPL_ACCOUNT_LAYOUT,
   TOKEN_PROGRAM_ID,
-  TokenAccount,
   ENDPOINT as _ENDPOINT,
   LOOKUP_TABLE_CACHE,
   RAYDIUM_MAINNET,
@@ -21,7 +18,6 @@ import {
 import {
   Connection,
   Keypair,
-  PublicKey,
   SendOptions,
   Signer,
   Transaction,
@@ -29,21 +25,15 @@ import {
   clusterApiUrl,
 } from '@solana/web3.js';
 import { RaydiumPools } from "./RaydiumPools";
+import { delay } from '../../Utils/utils';
+import { computeAmmountOut, getWalletTokenAccount } from './RaydiumUtils';
+import { TestTxInputInfo } from '../../../typings';
 
-type WalletTokenAccounts = Awaited<ReturnType<typeof getWalletTokenAccount>>
-type TestTxInputInfo = {
-  outputToken: Token
-  targetPool: string
-  inputTokenAmount: TokenAmount
-  slippage: Percent
-  walletTokenAccounts: WalletTokenAccounts
-  wallet: Keypair
-}
-
-const connection = new Connection(
+export const connection = new Connection(
   //"https://solana-api.projectserum.com",
-  clusterApiUrl("mainnet-beta"),
-  "confirmed"
+  //clusterApiUrl("mainnet-beta"),
+  //"confirmed"
+  "https://solana-mainnet.g.alchemy.com/v2/KLJ929cy51xIFQNv9-6M1jl5WSWC1IL4"
 );
 
 const ENDPOINT = _ENDPOINT;
@@ -72,17 +62,6 @@ async function sendTx(
   return txids;
 }
 
-async function getWalletTokenAccount(connection: Connection, wallet: PublicKey): Promise<TokenAccount[]> {
-  const walletTokenAccount = await connection.getTokenAccountsByOwner(wallet, {
-    programId: TOKEN_PROGRAM_ID,
-  });
-  return walletTokenAccount.value.map((i) => ({
-    pubkey: i.pubkey,
-    programId: i.account.owner,
-    accountInfo: SPL_ACCOUNT_LAYOUT.decode(i.account.data),
-  }));
-}
-
 async function buildAndSendTx(wallet: Keypair, innerSimpleV0Transaction: InnerSimpleV0Transaction[], options?: SendOptions) {
   const willSendTx = await buildSimpleTransaction({
     connection,
@@ -104,13 +83,7 @@ async function buildAndSendTx(wallet: Keypair, innerSimpleV0Transaction: InnerSi
 async function swapOnlyAmm(wallet: Keypair, input: TestTxInputInfo, poolKeys: LiquidityPoolKeysV4) {
 
   // -------- step 1: coumpute amount out --------
-  const { amountOut, minAmountOut } = Liquidity.computeAmountOut({
-    poolKeys: poolKeys,
-    poolInfo: await Liquidity.fetchInfo({ connection, poolKeys }),
-    amountIn: input.inputTokenAmount,
-    currencyOut: input.outputToken,
-    slippage: input.slippage,
-  })
+  const { amountOut, minAmountOut } = await computeAmmountOut(input, poolKeys, connection);
 
   // -------- step 2: create instructions by SDK function --------
   const { innerTransactions } = await Liquidity.makeSwapInstructionSimple({
@@ -131,19 +104,13 @@ async function swapOnlyAmm(wallet: Keypair, input: TestTxInputInfo, poolKeys: Li
   return { txids: await buildAndSendTx(wallet, innerTransactions) }
 }
 
-function delay() {
-  return new Promise(res => {
-    setTimeout(res, 500)
-  })
-}
-
 async function checkTransactionError(startTime: number, signature: string) {
   let newtime = new Date().getTime();
   let tdiff = newtime - startTime;
   if (tdiff > 30000) {
     throw new Error("tx check timeout")
   }
-  await delay()
+  await delay(500)
   const status = await connection.getSignatureStatus(signature);
 
   if (status.value?.confirmationStatus == "confirmed") {
@@ -166,7 +133,8 @@ export async function raydiumApiSwap(
   ammount: number,
   side: string,
   secretKey: number[] | Uint8Array | null,
-  pairing: string
+  pairing: string,
+  slippagePercent: number
 ) {
 
   // -------- pre-action: get pool info --------
@@ -184,15 +152,15 @@ export async function raydiumApiSwap(
   const decimal = token === "SOL"? 9 : 6;
 
   const tk = new Token(TOKEN_PROGRAM_ID, poolKeys.baseMint, decimal);
-  const usd = new Token(TOKEN_PROGRAM_ID, poolKeys.quoteMint, decimal);
+  const sol = new Token(TOKEN_PROGRAM_ID, poolKeys.quoteMint, decimal);
 
-  const inputToken = (side === "buy")? usd : tk;
-  const outputToken = (side === "buy")? tk : usd;
+  const inputToken = (side === "buy")? sol : tk;
+  const outputToken = (side === "buy")? tk : sol;
 
   const inputTokenAmount = new TokenAmount(inputToken, ammount * 1000000)
-  const slippage = new Percent(1, 100)
+  const slippage = new Percent(slippagePercent, 100);
   
-  const walletTokenAccounts = await getWalletTokenAccount(connection, wallet.publicKey)
+  const walletTokenAccounts = await getWalletTokenAccount(connection, wallet.publicKey);
 
   const txids = await swapOnlyAmm(wallet, {
     outputToken,
