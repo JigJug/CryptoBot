@@ -28,13 +28,12 @@ import { RaydiumPools } from "./RaydiumPools";
 import { delay } from '../../Utils/utils';
 import { computeAmmountOut, getWalletTokenAccount } from './RaydiumUtils';
 import { TestTxInputInfo } from '../../../typings';
-import { process } from '../../Strategy/Strategies/superstrategy';
 
 export const connection = new Connection(
   //"https://solana-api.projectserum.com",
   //clusterApiUrl("mainnet-beta"),
   //"confirmed"
-  process.env.PROVIDER
+  process.env.PROVIDER!
 );
 
 const ENDPOINT = _ENDPOINT;
