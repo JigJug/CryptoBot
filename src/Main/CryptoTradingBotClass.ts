@@ -66,18 +66,17 @@ class CryptoTradingBot {
       }
     })();
 
-        this.coin = 'SOL';
-        //load the data and dex clients, emitters, secretkey and strategy
-        this.events = events;
-        this.dataClient = dataClient;
-        this.marketDataController = this.setMarketDataController();
-        this.dexClient = this.setDex();
-        this.strategy = this.setStrategy();
-        //this.keyPair = keyPair
-        this.secretKey = this.setSecretKeyDev();
-        console.log(this.secretKey);
-        
-    }
+    this.coin = "SOL";
+    //load the data and dex clients, emitters, secretkey and strategy
+    this.events = events;
+    this.dataClient = dataClient;
+    this.marketDataController = this.setMarketDataController();
+    this.dexClient = this.setDex();
+    this.strategy = this.setStrategy();
+    //this.keyPair = keyPair
+    this.secretKey = this.setSecretKeyDev();
+    console.log(this.secretKey);
+  }
 
   setMarketDataController() {
     return new MarketDataController(
